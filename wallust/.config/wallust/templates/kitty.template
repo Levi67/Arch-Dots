@@ -1,0 +1,39 @@
+# Wallust Kitty Template
+
+# --- THE FIXED BACKGROUND ---
+# This ensures your background is ALWAYS #2f2f2f regardless of the wallpaper
+background #2f2f2f
+background_opacity 0.60
+
+# --- THE TEXT (Foreground) ---
+# Use color7 (usually a bright grey/white) so it's always readable
+foreground #ffffff
+
+# --- THE ACCENTS (The 16 colors) ---
+# These will still change based on your wallpaper for syntax highlighting
+color0  {{color0}}
+color1  {{color1}}
+color2  {{color2}}
+color3  {{color3}}
+color4  {{color4}}
+color5  {{color5}}
+color6  {{color6}}
+color7  {{color7}}
+color8  {{color8}}
+
+# Input text Color
+color9  #e0e0e0
+
+color10 {{color10}}
+color11 {{color11}}
+color12 {{color12}}
+color13 {{color13}}
+color14 {{color14}}
+color15 {{color15}}
+
+# Selection colors
+selection_foreground {{background}}
+selection_background {{color7}}
+
+# Cursor
+cursor {{color7}}

@@ -1,0 +1,10 @@
+{
+  "editor.defaultFormatter": "Abdu1-Ahd.omni-formatter",
+  "workbench.colorTheme": "Draculinho",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.editorAssociations": {
+    "{git,gitlens,chat-editing-snapshot-text-model,copilot,git-graph,git-graph-3}:/**/*.qrc": "default",
+    "*.qrc": "qt-core.qrcEditor"
+  },
+  "explorer.confirmDelete": false
+}
