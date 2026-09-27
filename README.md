@@ -6,7 +6,7 @@
 - https://www.reddit.com/r/Helldivers/comments/1kvll1a/solution_to_linux_fullscreen_and_white_border/
 
 ### Stuff To Do
-- Add zoixide
-- Add a keychain for github so i can push via terminal
+- ~~Add zoixide~~ 
+- ~~Add a keychain for github so i can push via terminal~~
 - Grub theme
 - Notification manager
