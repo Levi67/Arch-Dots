@@ -10,3 +10,4 @@
 - ~~Add a keychain for github so i can push via terminal~~
 - Grub theme
 - Notification manager
+- ~~**Add mangohud config into git and change the config**~~
