@@ -9,6 +9,8 @@ Text {
     
     color: textColor
     font.pixelSize: textSize
+    font.family: Theme.fontFamily
+    font.weight: Font.Bold
     
     // This updates the text automatically without needing an external 'date' process
     text: Qt.formatDateTime(new Date(), "hh:mm")
