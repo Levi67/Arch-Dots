@@ -1,0 +1,78 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "padding": {
+      "top": 1,
+      "left": 2
+    },
+    // Matches the slate-blue/lavender hue from your image (#7c839e)
+    "color": {
+      "1": "38;2;124;131;158"
+    }
+  },
+  "display": {
+    "separator": "  "
+  },
+  "modules": [
+    "title",
+    {
+      "type": "custom",
+      "format": "────────────"
+    },
+    {
+      "type": "os",
+      "key": "OS",
+      "keyColor": "90"
+    },
+    {
+      "type": "kernel",
+      "key": "Kernel",
+      "keyColor": "90"
+    },
+    {
+      "type": "uptime",
+      "key": "Uptime",
+      "keyColor": "90"
+    },
+    {
+      "type": "packages",
+      "key": "Packages",
+      "keyColor": "90"
+    },
+    {
+      "type": "shell",
+      "key": "Shell",
+      "keyColor": "90"
+    },
+    {
+      "type": "wm",
+      "key": "WM",
+      "keyColor": "90"
+    },
+    {
+      "type": "terminal",
+      "key": "Terminal",
+      "keyColor": "90"
+    },
+    {
+      "type": "cpu",
+      "key": "CPU",
+      "keyColor": "34"
+    },
+    {
+      "type": "gpu",
+      "key": "GPU",
+      "keyColor": "34"
+    },
+    {
+      "type": "memory",
+      "key": "Memory",
+      "keyColor": "34"
+    },
+    "break",
+    {
+      "type": "colors",
+      "symbol": "circle"
+    }
+  ]
+}
