@@ -1,0 +1,15 @@
+[Unit]
+Description=Awww and Wallust Wallpaper Poller
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/sleep 3
+ExecStart=/home/levi/.config/scripts/awww-wallust-executer.sh
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=WAYLAND_DISPLAY=wayland-0
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target
