@@ -1,7 +1,7 @@
 local hl = hl or hyprland
 local autostart_apps = {
     "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",
-    "awww-daemon",
+    -- "awww-daemon",
     "qs",
     "qs --path ~/.config/quickshell/launcher.qml",
     "easyeffects --gapplication-service",
