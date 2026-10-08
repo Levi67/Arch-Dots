@@ -9,6 +9,7 @@ hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
 
 -- Keep compiled shaders in the driver cache instead of evicting them
 hl.env("__GL_SHADER_DISK_CACHE_SKIP_CLEANUP", "1")
+hl.env("__GL_SHADER_DISK_CACHE_SIZE", "10737418240")  -- 10 GB cache limit
 
 -- Optional: only enable if an app fails to start without it
 -- (it has caused problems with some browsers in the past)
