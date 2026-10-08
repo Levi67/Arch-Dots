@@ -11,6 +11,8 @@ ShellRoot {
         property string activeWorkspace: "1"
     }
 
+    UI.Notifications {}
+
     // 2. VISUAL LAYER
     // This tells Quickshell to actually build the Bar window.
     UI.Bar {
