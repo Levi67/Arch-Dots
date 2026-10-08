@@ -80,7 +80,11 @@ Scope {
 
                     Timer {
                         running: !card.critical
-                        interval: (card.modelData.expireTimeout > 0 ? card.modelData.expireTimeout : 4) * 1000
+                        interval: {
+                        const t = card.modelData.expireTimeout
+                        if (t <= 0) return 5000          // no timeout given: default 5 s
+                            return t > 100 ? t : t * 1000    // large values are already ms
+                        }
                         onTriggered: card.modelData.expire()
                     }
 
