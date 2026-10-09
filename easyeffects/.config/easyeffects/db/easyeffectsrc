@@ -22,7 +22,7 @@ visiblePage=pluginsPage
 visiblePlugin=loudness#0
 
 [Window]
-height=1380
+height=1239
 inputAutoloadingFallbackPreset=NovaPro_Mic
 outputAutoloadingFallbackPreset=NovaPro_Output
 visiblePage=inputPage
