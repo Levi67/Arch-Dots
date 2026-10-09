@@ -1,14 +1,26 @@
 {
-    "editor.fontFamily": "JetBrainsMono Nerd Font",
-    "workbench.iconTheme": "vscode-material-theme-icons-default",
-    "workbench.editorAssociations": {
-        "{git,gitlens,chat-editing-snapshot-text-model,copilot,git-graph,git-graph-3}:/**/*.qrc": "default",
-        "*.qrc": "qt-core.qrcEditor"
+  "editor.fontFamily": "JetBrainsMono Nerd Font",
+  "workbench.iconTheme": "vscode-material-theme-icons-default",
+  "workbench.editorAssociations": {
+    "{git,gitlens,chat-editing-snapshot-text-model,copilot,git-graph,git-graph-3}:/**/*.qrc": "default",
+    "*.qrc": "qt-core.qrcEditor",
+  },
+  "qt-core.additionalQtPaths": [
+    {
+      "name": "Qt-5.15.19-linux-g++-x86_64_from_PATH",
+      "path": "/usr/sbin/qmake",
     },
-    "qt-core.additionalQtPaths": [
-        {
-            "name": "Qt-5.15.19-linux-g++-x86_64_from_PATH",
-            "path": "/usr/sbin/qmake"
-        }
-    ]
+  ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "customLocalFormatters.formatters": [
+    {
+      "command": "/home/levi/.local/bin/qmlformat-stdin",
+      "languages": ["qml"],
+    },
+  ],
+  "[qml]": {
+    "editor.defaultFormatter": "simkimsia.custom-local-formatters",
+    "editor.formatOnSave": true,
+  },
 }
