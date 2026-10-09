@@ -7,9 +7,9 @@ lastLoadedOutputPreset=NovaPro_Output_Loudness
 
 [StreamInputs]
 inputDevice=alsa_input.usb-SteelSeries_Arctis_Nova_Pro_Wireless-00.mono-fallback
-mostUsedPresets=NovaPro_Mic_v2,NovaPro_Mic_v4,NovaPro_Mic,NovaPro_Mic_v3,NovaPro_Mic_v5
+mostUsedPresets=NovaPro_Mic_v2,NovaPro_Mic_v4,NovaPro_Mic,NovaPro_Mic_v5,NovaPro_Mic_v3
 plugins=rnnoise#0,equalizer#0,expander#0,deesser#0,equalizer#1,compressor#0,limiter#0
-usedPresets=NovaPro_Mic:3,NovaPro_Mic_v2:6,NovaPro_Mic_v3:2,NovaPro_Mic_v4:4,NovaPro_Mic_v5:1
+usedPresets=NovaPro_Mic:3,NovaPro_Mic_v2:7,NovaPro_Mic_v3:2,NovaPro_Mic_v4:4,NovaPro_Mic_v5:2
 visiblePage=pluginsPage
 visiblePlugin=equalizer#0
 
@@ -17,12 +17,14 @@ visiblePlugin=equalizer#0
 mostUsedPresets=NovaPro_Output_Loudness,NovaPro_Output
 outputDevice=alsa_output.usb-SteelSeries_Arctis_Nova_Pro_Wireless-00.analog-stereo
 plugins=equalizer#0,loudness#0,limiter#0
-usedPresets=NovaPro_Output:1,NovaPro_Output_Loudness:3
+usedPresets=NovaPro_Output:1,NovaPro_Output_Loudness:4
 visiblePage=pluginsPage
 visiblePlugin=loudness#0
 
 [Window]
-height=1334
+height=1380
 inputAutoloadingFallbackPreset=NovaPro_Mic
 outputAutoloadingFallbackPreset=NovaPro_Output
+visiblePage=inputPage
+visiblePresetSheetPage=autoloadingPage
 width=2536
