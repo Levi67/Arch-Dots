@@ -1,12 +1,64 @@
 #!/usr/bin/env bash
 # Daemon: regenerates the theme whenever ~/.cache/wallpaper/current changes.
+set -uo pipefail
+
+tag="watch"
 cache="${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper"
+state="${XDG_STATE_HOME:-$HOME/.local/state}/wallpaper"
+logfile="$state/wallpaper.log"
 dir="$(dirname "$(readlink -f "$0")")"   # folder this script lives in
-mkdir -p "$cache"
+mkdir -p "$cache" "$state"
+
+# keep the log from growing forever (1 MB, one old copy)
+if [ -f "$logfile" ] && [ "$(stat -c %s "$logfile")" -gt 1048576 ]; then
+    mv -f "$logfile" "$logfile.old"
+fi
+
+log() { local lvl="$1"; shift; printf '%s [%s] [%-5s] %s\n' "$(date '+%F %T')" "$tag" "$lvl" "$*" | tee -a "$logfile" >&2; }
+
+log INFO "=== watcher started (pid $$) ==="
+log INFO "script folder: $dir"
+log INFO "watching: $cache (waiting for changes to 'current')"
+log INFO "log file: $logfile"
+
+missing=0
+for cmd in inotifywait wallust ffmpeg file; do
+    if command -v "$cmd" >/dev/null; then
+        log INFO "dependency ok: $cmd"
+    else
+        log ERROR "dependency missing: $cmd"
+        missing=1
+    fi
+done
+[ "$missing" = 1 ] && { log ERROR "install the missing packages (inotify-tools, wallust, ffmpeg, file) and restart the service"; exit 1; }
+
+run_theme() {
+    local t0 rc
+    t0=$(date +%s%3N)
+    log INFO "starting wallpaper-theme"
+    "$dir/wallpaper-theme"; rc=$?
+    if [ $rc -eq 0 ]; then
+        log INFO "wallpaper-theme finished OK ($(( $(date +%s%3N) - t0 ))ms)"
+    else
+        log ERROR "wallpaper-theme failed with exit code $rc (see the lines above)"
+    fi
+}
 
 # theme for whatever is set right now
-[ -f "$cache/current" ] && "$dir/wallpaper-theme" || true
+if [ -f "$cache/current" ]; then
+    log INFO "current wallpaper on start: $(cat "$cache/current") -> generating initial theme"
+    run_theme
+else
+    log WARN "no wallpaper set yet ($cache/current missing), waiting for wallpaper-set"
+fi
 
+log INFO "listening for changes..."
 inotifywait -m -q -e close_write,moved_to --format '%f' "$cache" | while read -r f; do
-    [ "$f" = current ] && { "$dir/wallpaper-theme" || true; }
+    if [ "$f" = current ]; then
+        log INFO "change detected: current -> $(cat "$cache/current" 2>/dev/null)"
+        run_theme
+    fi
 done
+
+log ERROR "inotifywait exited unexpectedly"
+exit 1

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Called by waypaper (post_command) after it set a wallpaper.
+# Only records the path -> wallpaper-watch then rebuilds the theme.
+# Usage: wallpaper-save /path/to/wallpaper
+set -uo pipefail
+
+tag="save"
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper"
+state="${XDG_STATE_HOME:-$HOME/.local/state}/wallpaper"
+logfile="$state/wallpaper.log"
+mkdir -p "$cache" "$state"
+
+log()  { local lvl="$1"; shift; printf '%s [%s] [%-5s] %s\n' "$(date '+%F %T')" "$tag" "$lvl" "$*" | tee -a "$logfile" >&2; }
+fail() { log ERROR "$*"; exit 1; }
+
+log INFO "called by waypaper with: '${1:-}'"
+# waypaper may wrap paths with spaces in single quotes itself -> strip them
+arg="${1:-}"
+arg="${arg#\'}"; arg="${arg%\'}"
+set -- "$arg"
+
+[ $# -ge 1 ] && [ -n "$1" ] || fail "no wallpaper path given (is \$wallpaper in post_command?)"
+[ -f "$1" ] || fail "file not found: $1"
+
+file="$(realpath "$1")"
+printf '%s\n' "$file" > "$cache/current"
+log INFO "saved $file to $cache/current -> the watcher service will rebuild the theme"

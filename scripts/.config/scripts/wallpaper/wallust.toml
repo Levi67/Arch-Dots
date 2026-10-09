@@ -1,8 +1,0 @@
-backend = "resized"
-color_space = "lab"
-palette = "dark16"
-check_contrast = true
-
-[templates]
-quickshell = { template = "quickshell-theme.qml", target = "~/.config/quickshell/theme/Theme.qml" }
-kitty      = { template = "kitty-colors.conf",    target = "~/.config/kitty/wallust-colors.conf" }

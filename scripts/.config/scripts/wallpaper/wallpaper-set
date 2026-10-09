@@ -1,16 +1,54 @@
 #!/usr/bin/env bash
 # Usage: wallpaper-set /path/to/video-or-image
 # Starts mpvpaper with the file and tells the watcher service to rebuild the theme.
-set -euo pipefail
+set -uo pipefail
 
-[ $# -ge 1 ] && [ -f "$1" ] || { echo "usage: wallpaper-set <file>" >&2; exit 1; }
-
+tag="set"
 cache="${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper"
-mkdir -p "$cache"
-file="$(realpath "$1")"
+state="${XDG_STATE_HOME:-$HOME/.local/state}/wallpaper"
+logfile="$state/wallpaper.log"
+mkdir -p "$cache" "$state"
 
-pkill -x mpvpaper || true
-setsid -f mpvpaper -o "no-audio loop hwdec=auto image-display-duration=inf" '*' "$file" >/dev/null 2>&1
+log()  { local lvl="$1"; shift; printf '%s [%s] [%-5s] %s\n' "$(date '+%F %T')" "$tag" "$lvl" "$*" | tee -a "$logfile" >&2; }
+fail() { log ERROR "$*"; exit 1; }
+
+log INFO "=== wallpaper-set started (pid $$) ==="
+
+[ $# -ge 1 ] || fail "usage: wallpaper-set <file>"
+[ -f "$1" ]  || fail "file not found: $1"
+command -v mpvpaper >/dev/null || fail "missing dependency: mpvpaper"
+
+file="$(realpath "$1")"
+log INFO "requested wallpaper: $file ($(du -h "$file" | cut -f1), $(file --mime-type -b "$file"))"
+
+if [ -n "${WAYLAND_DISPLAY:-}" ]; then
+    log INFO "WAYLAND_DISPLAY=$WAYLAND_DISPLAY"
+else
+    log WARN "WAYLAND_DISPLAY is not set, mpvpaper will probably fail (run this from inside your Hyprland session)"
+fi
+
+# stop the old wallpaper
+old="$(pgrep -x mpvpaper | tr '\n' ' ' || true)"
+if [ -n "$old" ]; then
+    log INFO "stopping running mpvpaper (pid $old)"
+    pkill -x mpvpaper || true
+    sleep 0.3
+else
+    log INFO "no mpvpaper was running"
+fi
+
+# start the new one (its own output goes to mpvpaper.log)
+log INFO "starting mpvpaper on all outputs (mpv output: $state/mpvpaper.log)"
+setsid -f mpvpaper -o "no-audio loop hwdec=auto image-display-duration=inf" '*' "$file" >>"$state/mpvpaper.log" 2>&1
+
+sleep 1
+new="$(pgrep -x mpvpaper | tr '\n' ' ' || true)"
+if [ -n "$new" ]; then
+    log INFO "mpvpaper is running (pid $new)"
+else
+    log ERROR "mpvpaper is NOT running after start, check $state/mpvpaper.log"
+fi
 
 # written last: this triggers wallpaper-watch
 printf '%s\n' "$file" > "$cache/current"
+log INFO "saved to $cache/current -> the watcher service will now rebuild the theme"

@@ -18,4 +18,5 @@ ShellRoot {
     UI.Bar {
         // You can pass data from your Scope down into the Bar here
     }
+    UI.WallpaperPicker {}
 }

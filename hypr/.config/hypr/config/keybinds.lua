@@ -3,8 +3,10 @@ local hl = hl or hyprland
 local terminal = "kitty"
 local fileManager = "dolphin"
 local menu = "qs ipc --path ~/.config/quickshell/launcher.qml call launcher toggle"
+local wallpaper = "qs ipc call wallpaper toggle"
 
 hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd(menu), { release = true })
+hl.bind("SUPER + W", hl.dsp.exec_cmd(wallpaper), { release = true })
 hl.bind("SUPER + Return", hl.dsp.exec_cmd(terminal))
 hl.bind("SUPER + Q", hl.dsp.window.close())
 hl.bind("SUPER + SHIFT + Q", hl.dsp.exec_cmd("uwsm stop"))
@@ -43,3 +45,4 @@ hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true 
 hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true })
 
 hl.bind("Print", hl.dsp.exec_cmd("hyprshot -m region --clipboard-only -t 3000"))
+
