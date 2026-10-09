@@ -4,16 +4,16 @@ import QtQuick
 
 QtObject {
     // Colors (from the wallpaper)
-    readonly property color background: "#0E131A"
-    readonly property color barBackground: "#bb0E131A"   // semi-transparent
+    readonly property color background: "#0F131A"
+    readonly property color barBackground: "#bb0F131A"   // semi-transparent
 
     // accent: wallust's color4, but never darker than this lightness (0 = black, 1 = white)
     readonly property real minAccentLightness: 0.65
-    readonly property color accentRaw: "#455D85"
+    readonly property color accentRaw: "#8397AB"
     readonly property color accent: Qt.hsla(Math.max(0, accentRaw.hslHue), accentRaw.hslSaturation, Math.max(accentRaw.hslLightness, minAccentLightness), 1.0)
-    readonly property color text: "#9FB7D1"
-    readonly property color inactiveWorkspace: "#566E85"
-    readonly property color activeWorkspace: "#9FB7D1"
+    readonly property color text: "#EDC1C5"
+    readonly property color inactiveWorkspace: "#997377"
+    readonly property color activeWorkspace: "#EDC1C5"
 
     // Spacing & Sizing
     readonly property int bubbleHeight: 30
