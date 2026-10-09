@@ -45,10 +45,13 @@ Scope {
                     anchors.left: parent.left
                     anchors.leftMargin: Theme.sideMargin
                     anchors.verticalCenter: parent.verticalCenter // Vertically centers the bubble in the bar
+                    spacing: Theme.bubbleSpacing
 
                     Bubble {
-                        // Ensure padding is inside your Bubble component or add it here
                         Workspaces {}
+                    }
+                    Bubble {
+                        SystemStats {}
                     }
                 }
 

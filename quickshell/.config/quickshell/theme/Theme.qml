@@ -1,14 +1,13 @@
 // This is a template! Wallust will turn this into your real Theme.qml
-import QtQuick
-
 pragma Singleton
+import QtQuick
 
 QtObject {
     // Colors (Clean, modern dark-mode aesthetic)
     readonly property color background: "#11111b"     // Deep, rich dark base (Catppuccin Crust style)
     readonly property color barBackground: "#bb181825" // Semi-transparent layered dark glass
 
-    readonly property color accent: "#f38ba8"          // Soft, vibrant rose/coral accent
+    readonly property color accent: '#8ba3f3'          // Soft, vibrant rose/coral accent
     readonly property color text: "#cdd6f4"            // Soft, high-readability off-white text
     readonly property color inactiveWorkspace: "#6c7086" // Muted slate gray for background items
 
@@ -27,13 +26,13 @@ QtObject {
     readonly property color activeWorkspace: "#FFFFFF" // Pure white for active focus
 
     // The actual height of the pill/bubble
-    readonly property int barHeight: 26  
+    readonly property int barHeight: 26
 
     // The transparent space above and below the bubble
     readonly property int verticalMargin: 8
 
     // The space from the screen edges (Left/Right)
-    readonly property int sideMargin: 10  
+    readonly property int sideMargin: 10
 
     // The space between different bubbles
     readonly property int bubbleSpacing: 12
