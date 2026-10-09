@@ -7,6 +7,7 @@ cache="${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper"
 state="${XDG_STATE_HOME:-$HOME/.local/state}/wallpaper"
 logfile="$state/wallpaper.log"
 dir="$(dirname "$(readlink -f "$0")")"   # folder this script lives in
+symlink_path="/home/levi/.cache/wallpaper/current_symlink"
 mkdir -p "$cache" "$state"
 
 # keep the log from growing forever (1 MB, one old copy)
@@ -32,6 +33,20 @@ for cmd in inotifywait wallust ffmpeg file; do
 done
 [ "$missing" = 1 ] && { log ERROR "install the missing packages (inotify-tools, wallust, ffmpeg, file) and restart the service"; exit 1; }
 
+# Helper to update the symlink to the absolute path written inside $cache/current
+update_symlink() {
+    if [ -f "$cache/current" ]; then
+        local wall_path
+        wall_path=$(cat "$cache/current")
+        if [ -f "$wall_path" ]; then
+            ln -sf "$wall_path" "$symlink_path"
+            log INFO "updated symlink: $symlink_path -> $wall_path"
+        else
+            log ERROR "cannot symlink: target file '$wall_path' does not exist"
+        fi
+    fi
+}
+
 run_theme() {
     local t0 rc
     t0=$(date +%s%3N)
@@ -47,6 +62,7 @@ run_theme() {
 # theme for whatever is set right now
 if [ -f "$cache/current" ]; then
     log INFO "current wallpaper on start: $(cat "$cache/current") -> generating initial theme"
+    update_symlink
     run_theme
 else
     log WARN "no wallpaper set yet ($cache/current missing), waiting for wallpaper-set"
@@ -56,6 +72,7 @@ log INFO "listening for changes..."
 inotifywait -m -q -e close_write,moved_to --format '%f' "$cache" | while read -r f; do
     if [ "$f" = current ]; then
         log INFO "change detected: current -> $(cat "$cache/current" 2>/dev/null)"
+        update_symlink
         run_theme
     fi
 done
