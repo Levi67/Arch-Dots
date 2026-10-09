@@ -1,0 +1,11 @@
+[Unit]
+Description=Generate Quickshell and kitty themes from the wallpaper
+
+[Service]
+Environment=PATH=%h/.config/scripts/wallpaper:/usr/local/bin:/usr/bin
+ExecStart=%h/.config/scripts/wallpaper/wallpaper-watch
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

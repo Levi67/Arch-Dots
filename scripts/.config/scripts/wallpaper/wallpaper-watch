@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Daemon: regenerates the theme whenever ~/.cache/wallpaper/current changes.
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper"
+dir="$(dirname "$(readlink -f "$0")")"   # folder this script lives in
+mkdir -p "$cache"
+
+# theme for whatever is set right now
+[ -f "$cache/current" ] && "$dir/wallpaper-theme" || true
+
+inotifywait -m -q -e close_write,moved_to --format '%f' "$cache" | while read -r f; do
+    [ "$f" = current ] && { "$dir/wallpaper-theme" || true; }
+done

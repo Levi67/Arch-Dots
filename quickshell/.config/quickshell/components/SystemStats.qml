@@ -12,6 +12,7 @@ Row {
     property int hotTemp: 80            // temps at/above this turn accent colored
     property bool showGpuTemp: false    // false = GPU usage %, true = GPU temperature
     property string iconFont: Theme.fontFamily   // must be a Nerd Font (or any installed Nerd Font gets used as fallback)
+    property int textSize: Theme.textSize
 
     // ---- values (filled by the script below) ----
     property int cpu: 0
@@ -84,17 +85,23 @@ Row {
         Text {
             text: parent.icon
             color: Theme.accent
-            font.pixelSize: Theme.fontSize + 2
+            font.pixelSize: root.textSize - 2
             font.family: root.iconFont
+            height: Theme.bubbleHeight
+            verticalAlignment: Text.AlignVCenter
             anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 0      // nudge icon: negative = up, positive = down
         }
         Text {
             text: parent.value
             color: parent.valueColor
-            font.pixelSize: Theme.fontSize
+            font.pixelSize: root.textSize - 2
             font.family: Theme.fontFamily
             font.weight: Font.Bold
+            height: Theme.bubbleHeight
+            verticalAlignment: Text.AlignVCenter
             anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 0      // nudge text: negative = up, positive = down
         }
     }
 

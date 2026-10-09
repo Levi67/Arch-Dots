@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Generates the Quickshell + kitty theme from the current wallpaper (image or video).
+# Usage: wallpaper-theme [file]   (no argument = use ~/.cache/wallpaper/current)
+set -euo pipefail
+
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper"
+mkdir -p "$cache"
+
+src="${1:-$(cat "$cache/current" 2>/dev/null || true)}"
+[ -n "$src" ] && [ -f "$src" ] || { echo "wallpaper-theme: no wallpaper found: '$src'" >&2; exit 1; }
+
+# which second of a video to grab the colors from
+frame_at="${FRAME_AT:-3}"
+
+case "$(file --mime-type -b "$src")" in
+    video/*|image/gif)
+        img="$cache/frame.png"
+        rm -f "$img"
+        ffmpeg -y -loglevel error -ss "$frame_at" -i "$src" -frames:v 1 "$img" || true
+        # video shorter than frame_at -> fall back to the very first frame
+        [ -s "$img" ] || ffmpeg -y -loglevel error -i "$src" -frames:v 1 "$img"
+        ;;
+    image/*)
+        img="$src"
+        ;;
+    *)
+        echo "wallpaper-theme: unsupported file type: $src" >&2
+        exit 1
+        ;;
+esac
+
+# writes Theme.qml + kitty colors (see ~/.config/wallust/wallust.toml)
+wallust run -q "$img"
+
+# kitty reloads its config on SIGUSR1; Quickshell reloads itself when Theme.qml changes
+pkill -USR1 -x kitty || true

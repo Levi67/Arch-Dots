@@ -57,13 +57,23 @@ Scope {
 
                 // SECTION 2: Center (Clock) - DEAD CENTER
                 Row {
-                    anchors.centerIn: parent // This ignores the sides and hits the exact middle
-
+                    id: centerRow
+                    anchors.centerIn: parent
                     Bubble {
                         Clock {
                             textColor: Theme.text
                             textSize: Theme.textSize
                         }
+                    }
+                }
+
+                // Weather bubble right next to the clock
+                Row {
+                    anchors.left: centerRow.right
+                    anchors.leftMargin: Theme.bubbleSpacing
+                    anchors.verticalCenter: parent.verticalCenter
+                    Bubble {
+                        Weather {}
                     }
                 }
 

@@ -1,0 +1,1 @@
+/home/levi/.config/scripts/wallpaper/quickshell-theme.qml

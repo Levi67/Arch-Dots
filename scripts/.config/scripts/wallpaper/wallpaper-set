@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Usage: wallpaper-set /path/to/video-or-image
+# Starts mpvpaper with the file and tells the watcher service to rebuild the theme.
+set -euo pipefail
+
+[ $# -ge 1 ] && [ -f "$1" ] || { echo "usage: wallpaper-set <file>" >&2; exit 1; }
+
+cache="${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper"
+mkdir -p "$cache"
+file="$(realpath "$1")"
+
+pkill -x mpvpaper || true
+setsid -f mpvpaper -o "no-audio loop hwdec=auto image-display-duration=inf" '*' "$file" >/dev/null 2>&1
+
+# written last: this triggers wallpaper-watch
+printf '%s\n' "$file" > "$cache/current"

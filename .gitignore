@@ -4,3 +4,4 @@ VSCodium/.config/VSCodium/User/*
 !VSCodium/.config/VSCodium/User/settings.json
 !VSCodium/.config/VSCodium/User/keybindings.json
 !VSCodium/.config/VSCodium/User/snippets/
+.env
