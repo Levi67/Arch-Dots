@@ -2,8 +2,9 @@ local hl = hl or hyprland
 
 local terminal = "kitty"
 local fileManager = "dolphin"
-local menu = "qs ipc --path ~/.config/quickshell/launcher.qml call launcher toggle"
-local wallpaper = "qs ipc call wallpaper toggle"
+local menu = "qs ipc --path ~/.config/quickshell/popups.qml call launcher toggle"
+
+local wallpaper = "qs ipc --path ~/.config/quickshell/popups.qml call wallpaper toggle"
 local lock = "hyprlock"
 local shader = "hyprshade toggle ~/.config/hypr/shaders/vibrance.glsl"
 

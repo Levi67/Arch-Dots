@@ -5,9 +5,9 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
 import Quickshell.Io
-import "./theme"
+import "../theme"
 
-ShellRoot {
+Scope {
     // --- THE IPC HANDLER ---
     IpcHandler {
         target: "launcher" // Required unique name for 'qs ipc call'

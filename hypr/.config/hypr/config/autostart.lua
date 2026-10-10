@@ -3,7 +3,7 @@ local autostart_apps = {
     "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP",
     -- "awww-daemon",
     "qs  --no-duplicate",
-    "qs --no-duplicate --path ~/.config/quickshell/launcher.qml",
+    "qs --no-duplicate --path ~/.config/quickshell/popups.qml",
     "easyeffects --gapplication-service",
     "flatpak run me.amankhanna.opendeck --hide",
     "waypaper --restore",
