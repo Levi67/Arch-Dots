@@ -7,6 +7,7 @@ tag="theme"
 cache="${XDG_CACHE_HOME:-$HOME/.cache}/wallpaper"
 state="${XDG_STATE_HOME:-$HOME/.local/state}/wallpaper"
 logfile="$state/wallpaper.log"
+
 mkdir -p "$cache" "$state"
 
 # ---- logging: stderr (-> journal / terminal) + log file ----
@@ -81,8 +82,9 @@ fi
 # ---- verify the outputs were really rewritten just now ----
 qs_theme="$HOME/.config/quickshell/theme/Theme.qml"
 kitty_colors="$HOME/.config/kitty/wallust-colors.conf"
+cava_theme="$HOME/.config/cava/themes/wallust"
 now=$(date +%s)
-for f in "$qs_theme" "$kitty_colors"; do
+for f in "$qs_theme" "$kitty_colors" "$cava_theme"; do
     if [ ! -f "$f" ]; then
         log WARN "NOT FOUND: $f (check the targets in wallust.toml)"
     elif [ $(( now - $(stat -c %Y "$f") )) -gt 30 ]; then
@@ -102,6 +104,13 @@ if pkill -USR1 -x kitty; then
     log INFO "sent reload signal (SIGUSR1) to kitty"
 else
     log WARN "no kitty process running, nothing to reload"
+fi
+
+# ---- reload cava (colors only) ----
+if pkill -USR2 -x cava; then
+    log INFO "sent color reload signal (SIGUSR2) to cava"
+else
+    log WARN "no cava process running, nothing to reload"
 fi
 
 log INFO "=== done in $(( $(date +%s%3N) - t0 ))ms ==="
