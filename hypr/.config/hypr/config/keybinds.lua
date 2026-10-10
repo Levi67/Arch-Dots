@@ -5,6 +5,7 @@ local fileManager = "dolphin"
 local menu = "qs ipc --path ~/.config/quickshell/launcher.qml call launcher toggle"
 local wallpaper = "qs ipc call wallpaper toggle"
 local lock = "hyprlock"
+local shader = "hyprshade toggle ~/.config/hypr/shaders/vibrance.glsl"
 
 hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd(menu), { release = true })
 hl.bind("SUPER + W", hl.dsp.exec_cmd(wallpaper), { release = true })
@@ -14,12 +15,12 @@ hl.bind("SUPER + Q", hl.dsp.window.close())
 hl.bind("SUPER + SHIFT + Q", hl.dsp.exec_cmd("uwsm stop"))
 hl.bind("SUPER + E", hl.dsp.exec_cmd(fileManager))
 hl.bind("SUPER + V", hl.dsp.window.float({ action = "toggle" }))
-hl.bind("SUPER + R", hl.dsp.exec_cmd(menu))
+hl.bind("SUPER + R", hl.dsp.workspace.toggle_special("rqs"))
 hl.bind("SUPER + P", hl.dsp.window.pseudo({ action = "toggle" }))
 hl.bind("SUPER + J", hl.dsp.group.toggle())
 hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 
-hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("hyprshade toggle ~/.config/hypr/shaders/vibrance.glsl"))
+hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd(shader))
 
 hl.bind("SUPER + left", hl.dsp.focus({ direction = "l" }))
 hl.bind("SUPER + right", hl.dsp.focus({ direction = "r" }))

@@ -17,4 +17,12 @@ if status is-interactive
     function ci
         __zoxide_zi $argv
     end
+
+    function start-black-camera
+        echo "Starting black virtual camera on /dev/video9..."
+        ffmpeg -f lavfi -i color=c=black:s=1920x1080:r=30 -pix_fmt yuv420p -f v4l2 /dev/video9
+    end
+
+
+
 end
