@@ -30,8 +30,8 @@ hl.config({
         },
         blur = {
             enabled = true,
-            size = 5,
-            passes = 1,
+            size = 6,
+            passes = 3,
             new_optimizations = true,
             xray = true,
         },
