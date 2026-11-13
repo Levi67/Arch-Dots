@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+# winterctl - control winter mode.
+#
+#   winterctl toggle              flip the master switch (SUPER+SHIFT+W)
+#   winterctl on|off              set the master switch
+#   winterctl set <feature> on|off   snowfall | windowCaps | bar
+#   winterctl apply               sync the Hyprland plugin with the config (login / after edits)
+#   winterctl status
+#
+# Settings: ~/.config/quickshell/defaults/winter.json overlaid with your changes in
+# ~/.config/desktop/winter.json (the settings app edits that one too).
+# Quickshell watches the JSON itself; this script only edits it and
+# loads/unloads the snowcaps Hyprland plugin (unloaded = zero cost).
+
+set -euo pipefail
+
+CFG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+DEFAULTS="$CFG_HOME/quickshell/defaults/winter.json"
+CONFIG="$CFG_HOME/desktop/winter.json"
+PLUGIN_DIR="${SNOWCAPS_DIR:-$HOME/Developement/hypr-snowcaps}"
+PLUGIN_SO="$PLUGIN_DIR/snowcaps.so"
+LOCK="${XDG_RUNTIME_DIR:-/tmp}/winterctl.lock"
+
+notify() { notify-send -a "Winter mode" -i weather-snow "$1" "${2:-}" 2>/dev/null || hyprctl notify 2 6000 0 "$1 $2" >/dev/null; }
+
+# Rewrite your file in place (keeps Quickshell's file watch intact)
+edit() {
+    local tmp
+    mkdir -p "$(dirname "$CONFIG")"
+    [[ -s "$CONFIG" ]] || echo '{}' >"$CONFIG"
+    tmp=$(mktemp)
+    jq "$@" "$CONFIG" >"$tmp" && cat "$tmp" >"$CONFIG"
+    rm -f "$tmp"
+}
+
+# read from defaults + your changes
+get() {
+    local d='{}' c='{}'
+    [[ -s "$DEFAULTS" ]] && d=$(cat "$DEFAULTS")
+    [[ -s "$CONFIG" ]] && c=$(cat "$CONFIG")
+    jq -rn --argjson d "$d" --argjson c "$c" "\$d * \$c | $1"
+}
+
+plugin_loaded() { hyprctl plugin list 2>/dev/null | grep -q "snowcaps"; }
+
+build_plugin() {
+    make -C "$PLUGIN_DIR" -B >/tmp/snowcaps-build.log 2>&1
+}
+
+load_plugin() {
+    plugin_loaded && return 0
+
+    # headers come with the hyprland package, so after a Hyprland update a rebuild is all it takes
+    if [[ ! -f "$PLUGIN_SO" || /usr/bin/Hyprland -nt "$PLUGIN_SO" ]]; then
+        notify "Rebuilding snow caps" "Hyprland changed since the last build…"
+        build_plugin || { notify "Snow caps unavailable" "Build failed, see /tmp/snowcaps-build.log"; return 1; }
+    fi
+
+    local out
+    out=$(hyprctl plugin load "$PLUGIN_SO" 2>&1) || true
+    if ! plugin_loaded; then
+        # one retry with a fresh build (e.g. a hyprland-git with the same mtime)
+        build_plugin && out=$(hyprctl plugin load "$PLUGIN_SO" 2>&1) || true
+        plugin_loaded || { notify "Snow caps unavailable" "$out"; return 1; }
+    fi
+
+    # Lua config: plugin options are set through hl.config (no `hyprctl keyword` anymore)
+    local grow height
+    grow=$(get '.windowCaps.growMinutes // 30')
+    height=$(get '.windowCaps.maxHeight // 32')
+    hyprctl eval "hl.config({ plugin = { snowcaps = { grow_minutes = $grow, max_height = $height } } })" >/dev/null || true
+}
+
+unload_plugin() {
+    plugin_loaded && hyprctl plugin unload "$PLUGIN_SO" >/dev/null || true
+}
+
+apply() {
+    if [[ "$(get '.enabled')" == "true" && "$(get '.features.windowCaps != false')" == "true" ]]; then
+        load_plugin || true
+    else
+        unload_plugin
+    fi
+}
+
+exec 9>"$LOCK"
+flock 9
+
+case "${1:-}" in
+    toggle) edit --argjson cur "$(get '.enabled // false')" '.enabled = ($cur | not)'; apply ;;
+    on)     edit '.enabled = true'; apply ;;
+    off)    edit '.enabled = false'; apply ;;
+    set)
+        [[ $# -eq 3 && "$3" =~ ^(on|off)$ ]] || { echo "usage: winterctl set <feature> on|off" >&2; exit 2; }
+        edit --arg f "$2" --argjson v "$([[ $3 == on ]] && echo true || echo false)" '.features[$f] = $v'
+        apply ;;
+    apply)  apply ;;
+    status)
+        echo "enabled: $(get '.enabled')"
+        get '.features | to_entries[] | "  \(.key): \(.value)"'
+        echo "plugin loaded: $(plugin_loaded && echo yes || echo no)" ;;
+    *) sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
+esac

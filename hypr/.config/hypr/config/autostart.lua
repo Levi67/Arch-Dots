@@ -10,7 +10,8 @@ local autostart_apps = {
     "systemctl --user start hyprpolkitagent",
     "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
     "env WEBKIT_DISABLE_DMABUF_RENDERER=1 rquickshare",
-    "sh -c 'sleep 2 && hyprshade on ~/.config/hypr/shaders/vibrance.glsl'"
+    "sh -c 'sleep 2 && hyprshade on ~/.config/hypr/shaders/vibrance.glsl'",
+    "sh -c 'sleep 3 && ~/.config/winter/winterctl apply'"  -- load snow caps plugin if winter mode is on
 }
 
 for _, cmd in ipairs(autostart_apps) do
