@@ -1,7 +1,11 @@
 // shell.qml
 import Quickshell
+import QtQuick
 
 import "components" as UI
+import "components/winter" as WinterUI
+import "components/settings" as SettingsUI
+import "theme"
 
 ShellRoot {
     // 1. DATA LAYER (Optional but recommended)
@@ -11,6 +15,9 @@ ShellRoot {
         property string activeWorkspace: "1"
     }
 
+    // this shell owns the bar, so winter mode may recolor it (popups keep wallust colors)
+    Component.onCompleted: Winter.themeOverride = true
+
     UI.Notifications {}
 
     // 2. VISUAL LAYER
@@ -19,4 +26,13 @@ ShellRoot {
         // You can pass data from your Scope down into the Bar here
     }
     UI.WallpaperPicker {}
+
+    // full settings overlay (SUPER+I / gear in the quick panel); the quick panel lives in Bar
+    SettingsUI.SettingsWindow {}
+
+    // Winter mode snowfall: only exists while enabled (Config.winter)
+    LazyLoader {
+        active: Winter.snowfallOn
+        component: WinterUI.Snowfall {}
+    }
 }

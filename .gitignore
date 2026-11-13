@@ -5,3 +5,4 @@ VSCodium/.config/VSCodium/User/*
 !VSCodium/.config/VSCodium/User/keybindings.json
 !VSCodium/.config/VSCodium/User/snippets/
 .env
+kitty/.config/kitty/settings-font.conf

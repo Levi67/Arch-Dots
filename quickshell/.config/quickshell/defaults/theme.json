@@ -1,0 +1,19 @@
+{
+  "wallpaper": {
+    "dir": "~/Pictures/Wallpapers",
+    "backend": ""
+  },
+  "wallust": {
+    "saturation": 0,
+    "checkContrast": false
+  },
+  "font": {
+    "family": "sans-serif",
+    "barSize": 20,
+    "uiSize": 13
+  },
+  "terminal": {
+    "family": "JetBrainsMono Nerd Font",
+    "size": 12
+  }
+}

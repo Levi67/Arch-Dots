@@ -71,8 +71,19 @@ case "$mime" in
 esac
 
 # ---- generate the theme ----
-log INFO "running wallust on $img"
-run wallust run -q "$img" || fail "wallust failed (check ~/.config/wallust/wallust.toml and templates)"
+# options from the settings window: defaults/theme.json + ~/.config/desktop/theme.json -> .wallust
+wallust_args=()
+cfgdir="${XDG_CONFIG_HOME:-$HOME/.config}"
+if command -v jq >/dev/null; then
+    d="$cfgdir/quickshell/defaults/theme.json"; c="$cfgdir/desktop/theme.json"
+    [ -s "$d" ] || d=/dev/null; [ -s "$c" ] || c=/dev/null
+    opts=$(jq -sc '(.[0] // {}) * (.[1] // {}) | .wallust // {}' "$d" "$c" 2>/dev/null || echo '{}')
+    sat=$(jq -r '.saturation // 0' <<<"$opts")
+    [ "${sat%.*}" -gt 0 ] 2>/dev/null && wallust_args+=(--saturation "${sat%.*}")
+    [ "$(jq -r '.checkContrast // false' <<<"$opts")" = true ] && wallust_args+=(--check-contrast)
+fi
+log INFO "running wallust on $img ${wallust_args[*]}"
+run wallust run -q "${wallust_args[@]}" "$img" || fail "wallust failed (check ~/.config/wallust/wallust.toml and templates)"
 
 # wallust prints [W] warnings (e.g. missing template) but still exits 0
 if printf '%s' "$LAST_OUT" | grep -q '\[[WE]\]'; then

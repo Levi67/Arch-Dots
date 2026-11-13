@@ -36,6 +36,13 @@ PACMAN_PKGS=(
     spotify
     curl
     tar
+    jq
+    # desktop settings app (Quickshell): bluetooth, night light, monitor brightness over DDC/CI
+    bluez
+    bluez-utils
+    hyprsunset
+    ddcutil
+    power-profiles-daemon
 )
 
 echo "=== Installing Official Packages ==="
@@ -62,6 +69,14 @@ sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flat
 # 6. Enable Ly Display Manager Service
 echo "=== Enabling Ly Login Screen ==="
 sudo systemctl enable ly.service
+
+# 6b. Desktop settings backends
+echo "=== Enabling Bluetooth, power profiles and DDC/CI (monitor brightness) ==="
+sudo systemctl enable --now bluetooth.service
+sudo systemctl enable --now power-profiles-daemon.service
+# ddcutil talks to monitors over /dev/i2c-*; load the module now and on every boot
+echo i2c-dev | sudo tee /etc/modules-load.d/i2c-dev.conf >/dev/null
+sudo modprobe i2c-dev || true
 
 # 7. Setup Spicetify Permissions & Initial Inject
 echo "=== Setting Up Spicetify ==="

@@ -8,9 +8,10 @@ Row {
     spacing: 12
 
     // ---- settings ----
-    property int updateSeconds: 2
-    property int hotTemp: 80            // temps at/above this turn accent colored
-    property bool showGpuTemp: false    // false = GPU usage %, true = GPU temperature
+    // from the settings window (Theme -> Bar -> System stats)
+    readonly property int updateSeconds: Math.max(1, Config.bar.get("stats.updateSeconds", 2))
+    readonly property int hotTemp: Config.bar.get("stats.hotTemp", 80)          // temps at/above this turn accent colored
+    readonly property bool showGpuTemp: Config.bar.get("stats.gpuTemp", false)  // false = GPU usage %, true = GPU temperature
     property string iconFont: Theme.fontFamily   // must be a Nerd Font (or any installed Nerd Font gets used as fallback)
     property int textSize: Theme.textSize
 
@@ -22,7 +23,14 @@ Row {
     property int gpuTemp: 0
 
     // One long-running shell loop that prints: cpu|cpuTemp|ramGB|gpu%|gpuTemp
+    // a new interval only takes effect in a fresh loop
+    onUpdateSecondsChanged: {
+        statsProc.running = false;
+        statsProc.running = true;
+    }
+
     Process {
+        id: statsProc
         running: true
         command: ["sh", "-c", `
             tempfile=""
@@ -107,12 +115,14 @@ Row {
 
     // CPU usage
     Stat {
+        visible: Config.bar.get("stats.cpu", true)
         icon: "\uf2db"
         value: root.cpu + "%"
     }
 
     // CPU temperature
     Stat {
+        visible: Config.bar.get("stats.cpuTemp", true)
         icon: "\uf2c9"
         value: root.cpuTemp + "°C"
         valueColor: root.cpuTemp >= root.hotTemp ? Theme.accent : Theme.text
@@ -120,12 +130,14 @@ Row {
 
     // RAM used (gauge icon)
     Stat {
+        visible: Config.bar.get("stats.ram", true)
         icon: "\udb81\udcc5"
         value: root.ramGb.toFixed(1) + "GB"
     }
 
     // GPU (usage % or temperature)
     Stat {
+        visible: Config.bar.get("stats.gpu", true)
         icon: root.showGpuTemp ? "\uf2c9" : "\uf26c"
         value: root.showGpuTemp ? root.gpuTemp + "°C" : root.gpu + "%"
         valueColor: (root.showGpuTemp && root.gpuTemp >= root.hotTemp) ? Theme.accent : Theme.text

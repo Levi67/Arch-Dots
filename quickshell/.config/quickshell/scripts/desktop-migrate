@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# One-time import of old settings into ~/.config/desktop/*.json:
+#   quickshell/.env  WEATHER_* -> bar.json, WALLPAPER_* -> theme.json (the keys are then removed from .env)
+#   ~/.config/winter/config.json (enabled + features) -> winter.json
+# Safe to run every start: it does nothing once the marker file exists.
+set -uo pipefail
+
+cfg="${XDG_CONFIG_HOME:-$HOME/.config}"
+live="$cfg/desktop"
+env="$cfg/quickshell/.env"
+marker="$live/.imported"
+mkdir -p "$live"
+exec 9>"$live/.lock"
+flock 9            # both Quickshell instances run this at start
+[ -e "$marker" ] && exit 0
+command -v jq >/dev/null || exit 1
+
+# jq edit of a live file, in place (keeps watchers happy)
+upd() {
+    local f="$live/$1.json" tmp
+    shift
+    [ -s "$f" ] || echo '{}' >"$f"
+    tmp=$(mktemp)
+    jq "$@" "$f" >"$tmp" && cat "$tmp" >"$f"
+    rm -f "$tmp"
+}
+
+if [ -f "$env" ]; then
+    val() { grep -E "^[[:space:]]*$1=" "$env" | tail -n1 | sed -E "s/^[[:space:]]*$1=[[:space:]]*//; s/^[\"']//; s/[\"'][[:space:]]*\$//"; }
+    loc=$(val WEATHER_LOCATION)
+    unit=$(val WEATHER_UNIT | tr '[:upper:]' '[:lower:]')
+    lat=$(val WEATHER_LATITUDE)
+    lon=$(val WEATHER_LONGITUDE)
+    wdir=$(val WALLPAPER_DIR)
+    wback=$(val WALLPAPER_BACKEND)
+    num='^-?[0-9]+(\.[0-9]+)?$'
+
+    [ -n "$loc" ] && upd bar --arg v "$loc" '.weather.location = $v'
+    [ -n "$unit" ] && upd bar --arg v "$unit" '.weather.unit = $v'
+    [[ "$lat" =~ $num && "$lon" =~ $num ]] && upd bar --argjson a "$lat" --argjson o "$lon" '.weather.latitude = $a | .weather.longitude = $o'
+    [ -n "$wdir" ] && upd theme --arg v "$wdir" '.wallpaper.dir = $v'
+    [ -n "$wback" ] && upd theme --arg v "$wback" '.wallpaper.backend = $v'
+
+    sed -i -E '/^[[:space:]]*(WEATHER_LOCATION|WEATHER_UNIT|WEATHER_LATITUDE|WEATHER_LONGITUDE|WALLPAPER_DIR|WALLPAPER_BACKEND)=/d' "$env"
+fi
+
+old="$cfg/winter/config.json"
+if [ -f "$old" ] && [ ! -s "$live/winter.json" ]; then
+    jq '{enabled, features}' "$old" >"$live/winter.json"
+fi
+
+touch "$marker"

@@ -21,8 +21,8 @@ Scope {
     // ---- state ----
     property bool shown: false
     property var targetScreen: null
-    property string wallpaperDir: ""     // from .env (WALLPAPER_DIR)
-    property string backend: ""          // from .env (WALLPAPER_BACKEND), optional
+    property string wallpaperDir: ""     // from Config.theme wallpaper.dir
+    property string backend: ""          // from Config.theme wallpaper.backend, optional
     property string query: ""
     property var files: []               // [{ path, rel, name, folder, video }]
     property var scanBuffer: []
@@ -39,51 +39,22 @@ Scope {
         return files.filter(f => words.every(w => f.rel.toLowerCase().includes(w)));
     }
 
-    // ---- config: .env (yours) over .env.example (in git) ----
-    FileView {
-        id: envFile
-        path: Quickshell.shellPath(".env")
-        blockLoading: true
-        printErrors: false
-        watchChanges: true
-        onFileChanged: reload()
-    }
-    FileView {
-        id: envExample
-        path: Quickshell.shellPath(".env.example")
-        blockLoading: true
-        printErrors: false
-    }
-
-    function parseEnv(text) {
-        const out = {};
-        for (const raw of (text ?? "").split("\n")) {
-            const line = raw.trim();
-            if (!line || line.startsWith("#"))
-                continue;
-            const eq = line.indexOf("=");
-            if (eq < 1)
-                continue;
-            out[line.slice(0, eq).trim()] = line.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
-        }
-        return out;
-    }
-
-    function readFile(view) {
-        try {
-            return view.text();
-        } catch (e) {
-            return "";
-        }
-    }
+    // ---- config: Config.theme (settings window -> Theme -> Wallpaper) ----
+    readonly property string cfgDir: Config.theme.get("wallpaper.dir", "")
+    readonly property string cfgBackend: Config.theme.get("wallpaper.backend", "")
+    onCfgDirChanged: loadConfig()
+    onCfgBackendChanged: loadConfig()
 
     function loadConfig() {
-        const cfg = Object.assign({}, parseEnv(readFile(envExample)), parseEnv(readFile(envFile)));
-        let dir = cfg.WALLPAPER_DIR ?? "";
-        if (dir.startsWith("~"))
-            dir = Quickshell.env("HOME") + dir.slice(1);
-        wallpaperDir = dir.replace(/\/+$/, "");
-        backend = cfg.WALLPAPER_BACKEND ?? "";
+        const dir = Config.expand(cfgDir).replace(/\/+$/, "");
+        backend = cfgBackend;
+        if (dir === wallpaperDir)
+            return;
+        wallpaperDir = dir;
+        if (wallpaperDir !== "") {
+            scanBuffer = [];
+            scan.running = true;
+        }
     }
 
     // ---- scanning the folder (including subfolders) ----
@@ -192,13 +163,7 @@ Scope {
     }
 
     // build the list and the thumbnail cache at startup, so the first open is instant too
-    Component.onCompleted: {
-        loadConfig();
-        if (wallpaperDir !== "") {
-            scanBuffer = [];
-            scan.running = true;
-        }
-    }
+    Component.onCompleted: loadConfig()   // scans as soon as the folder is known
 
     function closePicker() {
         shown = false;

@@ -1,0 +1,33 @@
+{
+  "enabled": false,
+  "features": {
+    "snowfall": true,
+    "windowCaps": true,
+    "bar": true
+  },
+  "snowfall": {
+    "density": 1.0,
+    "emptyDensity": 2.2,
+    "speed": 1.0,
+    "fps": 60
+  },
+  "pile": {
+    "enabled": true,
+    "maxHeight": 70,
+    "growMinutes": 15,
+    "meltMinutes": 10
+  },
+  "windowCaps": {
+    "growMinutes": 30,
+    "maxHeight": 32
+  },
+  "bar": {
+    "flakes": true,
+    "flakeDensity": 1.0,
+    "tint": "#7014202C",
+    "text": "#FFFFFF",
+    "inactive": "#B3FFFFFF",
+    "accent": "#FFFFFF",
+    "frost": 1.0
+  }
+}

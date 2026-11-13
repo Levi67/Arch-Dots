@@ -9,7 +9,7 @@ Row {
     spacing: 6
 
     // ---- settings ----
-    property int refreshMinutes: 10
+    readonly property int refreshMinutes: Math.max(1, Config.bar.get("weather.refreshMinutes", 10))
 
     property int textSize: Theme.textSize
     property string emojiFont: "Noto Color Emoji"
@@ -26,46 +26,13 @@ Row {
     property real geoLat: 0
     property real geoLon: 0
 
-    // ---- config: .env (yours, not in git) falls back to .env.example (in git) ----
-    FileView {
-        id: envFile
-        path: Quickshell.shellPath(".env")
-        blockLoading: true
-        printErrors: false
-    }
-    FileView {
-        id: envExample
-        path: Quickshell.shellPath(".env.example")
-        blockLoading: true
-        printErrors: false
-    }
-
-    function parseEnv(text) {
-        const out = {};
-        for (const raw of (text ?? "").split("\n")) {
-            const line = raw.trim();
-            if (!line || line.startsWith("#"))
-                continue;
-            const eq = line.indexOf("=");
-            if (eq < 1)
-                continue;
-            out[line.slice(0, eq).trim()] = line.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
-        }
-        return out;
-    }
-
-    function readFile(view) {
-        try {
-            return view.text();
-        } catch (e) {
-            return "";
-        }
-    }
-
-    function loadConfig() {
-        const base = parseEnv(readFile(envExample));
-        const mine = parseEnv(readFile(envFile));
-        return Object.assign({}, base, mine);
+    // ---- config: Config.bar (settings window -> Theme -> Bar -> Weather) ----
+    readonly property var cfg: Config.bar.get("weather", ({}))
+    onCfgChanged: refreshDebounce.restart()
+    Timer {
+        id: refreshDebounce
+        interval: 500
+        onTriggered: root.refresh()
     }
 
     // ---- networking ----
@@ -99,16 +66,15 @@ Row {
     }
 
     function refresh() {
-        const cfg = loadConfig();
-        const unit = (cfg.WEATHER_UNIT ?? "celsius").toLowerCase() === "fahrenheit" ? "fahrenheit" : "celsius";
+        const unit = String(cfg.unit ?? "celsius").toLowerCase() === "fahrenheit" ? "fahrenheit" : "celsius";
 
-        // exact coordinates in .env skip the city lookup
-        if (cfg.WEATHER_LATITUDE && cfg.WEATHER_LONGITUDE) {
-            fetchWeather(cfg.WEATHER_LATITUDE, cfg.WEATHER_LONGITUDE, unit);
+        // exact coordinates skip the city lookup
+        if (typeof cfg.latitude === "number" && typeof cfg.longitude === "number") {
+            fetchWeather(cfg.latitude, cfg.longitude, unit);
             return;
         }
 
-        const name = cfg.WEATHER_LOCATION;
+        const name = cfg.location;
         if (!name)
             return;
 

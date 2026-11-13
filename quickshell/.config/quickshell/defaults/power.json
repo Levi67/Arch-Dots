@@ -1,0 +1,9 @@
+{
+  "nightLight": {
+    "enabled": false,
+    "schedule": "manual",
+    "temperature": 4000,
+    "from": "21:00",
+    "to": "07:00"
+  }
+}

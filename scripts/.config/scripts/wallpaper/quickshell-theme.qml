@@ -3,26 +3,29 @@ pragma Singleton
 import QtQuick
 
 QtObject {
+    // winter mode replaces the bar colors (only in the shell that opts in via Winter.themeOverride)
+    readonly property bool winter: Winter.themeOverride && Winter.barOn
+
     // Colors (from the wallpaper)
     readonly property color background: "{{background}}"
-    readonly property color barBackground: "#bb{{background | strip}}"   // semi-transparent
+    readonly property color barBackground: winter ? Winter.barTint : "#bb{{background | strip}}"   // semi-transparent
 
     // accent: wallust's color4, but never darker than this lightness (0 = black, 1 = white)
     readonly property real minAccentLightness: 0.65
     readonly property color accentRaw: "{{color4}}"
-    readonly property color accent: Qt.hsla(Math.max(0, accentRaw.hslHue), accentRaw.hslSaturation, Math.max(accentRaw.hslLightness, minAccentLightness), 1.0)
-    readonly property color text: "{{foreground}}"
-    readonly property color inactiveWorkspace: "{{color8}}"
-    readonly property color activeWorkspace: "{{foreground}}"
+    readonly property color accent: winter ? Winter.barAccent : Qt.hsla(Math.max(0, accentRaw.hslHue), accentRaw.hslSaturation, Math.max(accentRaw.hslLightness, minAccentLightness), 1.0)
+    readonly property color text: winter ? Winter.barText : "{{foreground}}"
+    readonly property color inactiveWorkspace: winter ? Winter.barInactive : "{{color8}}"
+    readonly property color activeWorkspace: winter ? Winter.barText : "{{foreground}}"
 
     // Spacing & Sizing
     readonly property int bubbleHeight: 30
     readonly property int padding: 8
-    readonly property int fontSize: 13
+    readonly property int fontSize: Config.theme.get("font.uiSize", 13)
 
     // Text properties
-    readonly property int textSize: 20
-    readonly property string fontFamily: "sans-serif"   // <- put your font here
+    readonly property int textSize: Config.theme.get("font.barSize", 20)
+    readonly property string fontFamily: Config.theme.get("font.family", "sans-serif")   // settings window -> Theme
 
     readonly property int gapSize: 5
     readonly property int barPadding: 8

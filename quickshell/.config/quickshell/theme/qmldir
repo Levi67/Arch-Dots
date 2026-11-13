@@ -1,1 +1,6 @@
 singleton Theme 1.0 Theme.qml
+singleton Winter 1.0 Winter.qml
+singleton Config 1.0 Config.qml
+singleton ShellState 1.0 ShellState.qml
+ConfigFile 1.0 ConfigFile.qml
+singleton NightLight 1.0 NightLight.qml

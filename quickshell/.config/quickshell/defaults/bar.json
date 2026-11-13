@@ -1,0 +1,34 @@
+{
+  "monitors": [],
+  "modules": {
+    "workspaces": true,
+    "stats": true,
+    "clock": true,
+    "timers": true,
+    "weather": true,
+    "voice": true,
+    "media": true,
+    "status": true
+  },
+  "clock": {
+    "hour24": true,
+    "seconds": false,
+    "date": ""
+  },
+  "weather": {
+    "location": "Berlin",
+    "latitude": null,
+    "longitude": null,
+    "unit": "celsius",
+    "refreshMinutes": 10
+  },
+  "stats": {
+    "cpu": true,
+    "cpuTemp": true,
+    "ram": true,
+    "gpu": true,
+    "gpuTemp": false,
+    "hotTemp": 80,
+    "updateSeconds": 2
+  }
+}

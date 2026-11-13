@@ -16,6 +16,8 @@ hl.window_rule({
 
 hl.layer_rule({ match = { namespace = "launcher" }, blur = true, ignore_alpha = 0.0, animation = "slide" })
 hl.layer_rule({ match = { namespace = "quickshell" }, blur = true, ignore_alpha = 0.3 })
+hl.layer_rule({ match = { namespace = "quickshell-quick" }, blur = true, ignore_alpha = 0.3 })
+hl.layer_rule({ match = { namespace = "quickshell-settings" }, blur = true, ignore_alpha = 0.3 })
 hl.layer_rule({ match = { namespace = "notifications" }, blur = true, ignore_alpha = 0.3, animation = "slide" })
 
 -- Apps that get blur, with the window opacity for each (nil = leave opacity alone)

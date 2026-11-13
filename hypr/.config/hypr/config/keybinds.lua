@@ -25,6 +25,7 @@ hl.bind("SUPER + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "t
 
 hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd(shader))
 hl.bind("SUPER + SHIFT + W", hl.dsp.exec_cmd("~/.config/winter/winterctl toggle"))  -- winter mode
+hl.bind("SUPER + I", hl.dsp.exec_cmd("qs ipc call settings toggle"))
 
 hl.bind("SUPER + left", hl.dsp.focus({ direction = "l" }))
 hl.bind("SUPER + right", hl.dsp.focus({ direction = "r" }))
