@@ -13,6 +13,12 @@ Singleton {
     readonly property bool enabled: cfg.enabled === true
     readonly property bool snowfallOn: enabled && feature("snowfall")
     readonly property bool barOn: enabled && feature("bar")
+    readonly property bool capsOn: enabled && feature("windowCaps")
+
+    // snow caps (windows: hypr-snowcaps plugin; Launcher / wallpaper picker: components/winter/PopupSnowCap.qml)
+    readonly property real capMaxHeight: num(cfg.windowCaps, "maxHeight", 32)
+    readonly property real popupCapGrowMs: Math.max(0.1, num(cfg.popupCaps, "growMinutes", 2)) * 60000
+    readonly property real popupCapMeltMs: Math.max(0.1, num(cfg.popupCaps, "meltMinutes", 30)) * 60000
 
     // tunables with defaults, so a partial/missing config still works
     readonly property real density: num(cfg.snowfall, "density", 1.0)

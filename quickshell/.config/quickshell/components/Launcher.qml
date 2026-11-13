@@ -21,8 +21,10 @@ Scope {
 
     PanelWindow {
         id: launcherWindow
+        // winter mode: room above the card for its snow cap
+        readonly property real capRoom: Winter.capsOn ? Math.ceil(1.3 * Winter.capMaxHeight + 6) : 0
         implicitWidth: 600
-        implicitHeight: 700
+        implicitHeight: 700 + capRoom
         color: "transparent"
         visible: false
 
@@ -49,7 +51,7 @@ Scope {
             border.width: 1
             clip: true
             opacity: 0
-            y: 20
+            y: launcherWindow.capRoom + 20
 
             ParallelAnimation {
                 id: openAnim
@@ -64,8 +66,8 @@ Scope {
                 NumberAnimation {
                     target: rootRect
                     property: "y"
-                    from: 20
-                    to: 0
+                    from: launcherWindow.capRoom + 20
+                    to: launcherWindow.capRoom
                     duration: 150
                     easing.type: Easing.OutQuint
                 }
@@ -188,6 +190,12 @@ Scope {
                     }
                 }
             }
+        }
+
+        // winter mode: snow piling up on top of the launcher
+        WinterUI.PopupSnowCap {
+            target: rootRect
+            open: launcherWindow.visible
         }
     }
 }

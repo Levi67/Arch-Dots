@@ -538,5 +538,11 @@ Scope {
                 }
             }
         }
+
+        // winter mode: snow piling up on top of the picker
+        WinterUI.PopupSnowCap {
+            target: card
+            open: win.visible
+        }
     }
 }

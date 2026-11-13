@@ -220,6 +220,40 @@ SPage {
     }
 
     SCard {
+        title: "Snow on the Launcher & wallpaper picker"
+        icon: "snow"
+        enabled: page.c.get("enabled", false) && page.c.get("features.windowCaps", true)
+
+        SRow {
+            label: "Time to pile up"
+            hint: "Counts only while the popup is open; kept between opens"
+            SSlider {
+                Layout.preferredWidth: 300
+                from: 0.5
+                to: 20
+                stepSize: 0.5
+                decimals: 1
+                suffix: " min"
+                value: page.c.get("popupCaps.growMinutes", 2)
+                onCommitted: v => page.set("popupCaps.growMinutes", v)
+            }
+        }
+        SRow {
+            label: "Time to melt"
+            hint: "While the popup is closed"
+            SSlider {
+                Layout.preferredWidth: 300
+                from: 1
+                to: 120
+                stepSize: 1
+                suffix: " min"
+                value: page.c.get("popupCaps.meltMinutes", 30)
+                onCommitted: v => page.set("popupCaps.meltMinutes", v)
+            }
+        }
+    }
+
+    SCard {
         title: "Icy bar"
         icon: "snow"
         enabled: page.c.get("enabled", false)

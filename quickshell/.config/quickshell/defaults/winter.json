@@ -29,5 +29,9 @@
     "inactive": "#B3FFFFFF",
     "accent": "#FFFFFF",
     "frost": 1.0
+  },
+  "popupCaps": {
+    "growMinutes": 2,
+    "meltMinutes": 30
   }
 }
