@@ -139,21 +139,28 @@ Singleton {
     }
 
     // ---- hyprsunset ----
+    // is it installed? also stop a leftover hyprsunset (e.g. from before a Quickshell restart),
+    // so the screen is only warm while `active` says so
     Process {
         running: true
-        command: ["sh", "-c", "command -v hyprsunset"]
+        command: ["sh", "-c", "command -v hyprsunset >/dev/null || exit 1; pkill -x hyprsunset; exit 0"]
         onExited: code => root.available = code === 0
     }
 
+    // runs exactly while night light is on (never set `running` by hand: that would break this binding)
     Process {
         id: sunset
         running: root.available && root.active
         command: ["hyprsunset", "-t", String(root.temperature)]
     }
 
-    // a new temperature needs a fresh hyprsunset
+    // new warmth while it's on: tell the running hyprsunset over its IPC (no restart, no flicker)
+    Process {
+        id: setTemp
+    }
     onTemperatureChanged: if (sunset.running) {
-        sunset.running = false;
-        sunset.running = true;
+        // command set here, not bound: a binding might still hold the old value at this point
+        setTemp.command = ["hyprctl", "hyprsunset", "temperature", String(temperature)];
+        setTemp.running = true;
     }
 }
