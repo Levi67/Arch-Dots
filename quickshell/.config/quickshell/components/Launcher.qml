@@ -6,6 +6,7 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import Quickshell.Io
 import "../theme"
+import "winter" as WinterUI
 
 Scope {
     // --- THE IPC HANDLER ---
@@ -39,8 +40,10 @@ Scope {
 
         Rectangle {
             id: rootRect
-            anchors.fill: parent
-            color: Theme.barBackground
+            width: parent.width
+            height: 700
+            // winter: the bar's ice glass, denser so the list stays readable
+            color: Theme.winter ? Qt.rgba(Theme.barBackground.r, Theme.barBackground.g, Theme.barBackground.b, Math.max(Theme.barBackground.a, 0.82)) : Theme.barBackground
             radius: 20
             border.color: Qt.darker(Theme.accent, 1.6)
             border.width: 1
@@ -65,6 +68,14 @@ Scope {
                     to: 0
                     duration: 150
                     easing.type: Easing.OutQuint
+                }
+            }
+
+            Loader {
+                anchors.fill: parent
+                active: Winter.barFlakes && launcherWindow.visible
+                sourceComponent: WinterUI.BubbleFlakes {
+                    radius: rootRect.radius
                 }
             }
 
@@ -122,7 +133,7 @@ Scope {
                         width: list.width
                         height: Theme.bubbleHeight + Theme.padding
                         background: Rectangle {
-                            color: hovered ? Theme.inactiveWorkspace : "transparent"
+                            color: hovered ? (Theme.winter ? Qt.rgba(1, 1, 1, 0.12) : Theme.inactiveWorkspace) : "transparent"
                             radius: 8
                             border.width: hovered ? 1 : 0
                             border.color: Qt.darker(Theme.accent, 1.6)

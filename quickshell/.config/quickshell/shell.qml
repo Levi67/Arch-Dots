@@ -16,7 +16,12 @@ ShellRoot {
     }
 
     // this shell owns the bar, so winter mode may recolor it (popups keep wallust colors)
-    Component.onCompleted: Winter.themeOverride = true
+    // (a Binding, not onCompleted: it also holds across Quickshell's hot reloads)
+    Binding {
+        target: Winter
+        property: "themeOverride"
+        value: true
+    }
 
     UI.Notifications {}
 

@@ -6,6 +6,7 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 import Quickshell.Hyprland
 import "../theme"
+import "winter" as WinterUI
 
 Scope {
     id: root
@@ -237,9 +238,18 @@ Scope {
             width: Math.min(root.cardWidth, parent.width - 80)
             height: Math.min(root.cardHeight, parent.height - 80)
             radius: 20
-            color: Theme.background
+            // winter: the bar's ice glass (blurred, see window_layer_rules.lua), dense enough for the grid
+            color: Theme.winter ? Qt.rgba(Theme.barBackground.r, Theme.barBackground.g, Theme.barBackground.b, Math.max(Theme.barBackground.a, 0.85)) : Theme.background
             border.width: 1
-            border.color: Theme.inactiveWorkspace
+            border.color: Theme.winter ? Qt.rgba(1, 1, 1, 0.18) : Theme.inactiveWorkspace
+
+            Loader {
+                anchors.fill: parent
+                active: Winter.barFlakes && win.visible
+                sourceComponent: WinterUI.BubbleFlakes {
+                    radius: card.radius
+                }
+            }
 
             // swallow clicks so the backdrop doesn't close the popup
             MouseArea {
@@ -396,7 +406,7 @@ Scope {
                         }
                         height: grid.cellHeight - 50
                         radius: 12
-                        color: Theme.inactiveWorkspace
+                        color: Theme.winter ? Qt.rgba(1, 1, 1, 0.08) : Theme.inactiveWorkspace
                         border.width: cell.current ? 3 : 0
                         border.color: Theme.accent
 

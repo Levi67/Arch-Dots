@@ -18,6 +18,8 @@ hl.layer_rule({ match = { namespace = "launcher" }, blur = true, ignore_alpha = 
 hl.layer_rule({ match = { namespace = "quickshell" }, blur = true, ignore_alpha = 0.3 })
 hl.layer_rule({ match = { namespace = "quickshell-quick" }, blur = true, ignore_alpha = 0.3 })
 hl.layer_rule({ match = { namespace = "quickshell-settings" }, blur = true, ignore_alpha = 0.3 })
+-- wallpaper picker: only its card (alpha >= 0.85) is blurred, not the dimmed backdrop (0.6)
+hl.layer_rule({ match = { namespace = "quickshell-wallpaper" }, blur = true, ignore_alpha = 0.7 })
 hl.layer_rule({ match = { namespace = "notifications" }, blur = true, ignore_alpha = 0.3, animation = "slide" })
 
 -- Apps that get blur, with the window opacity for each (nil = leave opacity alone)
