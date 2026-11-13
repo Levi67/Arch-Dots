@@ -197,6 +197,7 @@ band8Type=0
 band9Type=0
 
 [soe][Equalizer#0]
+inputGain=-3
 numBands=6
 
 [soe][Equalizer#0#left]
