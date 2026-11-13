@@ -4,4 +4,5 @@ import "components"
 ShellRoot {
     Launcher {}
     WallpaperPicker {}
+    Debate {}
 }

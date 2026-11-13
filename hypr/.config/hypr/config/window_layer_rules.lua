@@ -44,3 +44,4 @@ for _, app in ipairs(blur_apps) do
     end
     hl.window_rule(rule)
 end
+hl.layer_rule({ match = { namespace = "quickshell-debate" }, blur = true, ignore_alpha = 0.3 })

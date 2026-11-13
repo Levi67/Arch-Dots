@@ -5,11 +5,13 @@ local fileManager = "dolphin"
 local menu = "qs ipc --path ~/.config/quickshell/popups.qml call launcher toggle"
 
 local wallpaper = "qs ipc --path ~/.config/quickshell/popups.qml call wallpaper toggle"
+local debate = "qs ipc --path ~/.config/quickshell/popups.qml call debate toggle"
 local lock = "hyprlock"
 local shader = "hyprshade toggle ~/.config/hypr/shaders/vibrance.glsl"
 
 hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd(menu), { release = true })
 hl.bind("SUPER + W", hl.dsp.exec_cmd(wallpaper), { release = true })
+hl.bind("SUPER + D", hl.dsp.exec_cmd(debate), { release = true })
 hl.bind("SUPER + L", hl.dsp.exec_cmd(lock), { release = true })
 hl.bind("SUPER + Return", hl.dsp.exec_cmd(terminal))
 hl.bind("SUPER + Q", hl.dsp.window.close())
