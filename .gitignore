@@ -6,3 +6,6 @@ VSCodium/.config/VSCodium/User/*
 !VSCodium/.config/VSCodium/User/snippets/
 .env
 kitty/.config/kitty/settings-font.conf
+
+# easyeffects runtime lock files
+easyeffects/.config/easyeffects/db/*.lock*
