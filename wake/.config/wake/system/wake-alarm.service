@@ -1,0 +1,12 @@
+[Unit]
+Description=Arm RTC to power on the PC daily at 05:40
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# Set on boot and again right before shutdown (so it's always the next 05:40)
+ExecStart=/usr/local/bin/set-wake-alarm
+ExecStop=/usr/local/bin/set-wake-alarm
+
+[Install]
+WantedBy=multi-user.target

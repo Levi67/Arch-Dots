@@ -9,3 +9,6 @@ kitty/.config/kitty/settings-font.conf
 
 # easyeffects runtime lock files
 easyeffects/.config/easyeffects/db/*.lock*
+
+# installed by spicetify / its marketplace
+spicetify/.config/spicetify/CustomApps/marketplace/

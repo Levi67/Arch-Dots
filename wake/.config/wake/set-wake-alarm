@@ -1,0 +1,10 @@
+#!/bin/sh
+# Arm the RTC to power the PC on at the next 05:40.
+WAKE="${WAKE_TIME:-05:40}"
+now=$(date +%s)
+t=$(date -d "today $WAKE" +%s)
+[ "$t" -le "$now" ] && t=$(date -d "tomorrow $WAKE" +%s)
+# Keep an earlier alarm someone else set (e.g. a wake test), don't overwrite it.
+cur=$(cat /sys/class/rtc/rtc0/wakealarm 2>/dev/null)
+if [ -n "$cur" ] && [ "$cur" -gt "$now" ] && [ "$cur" -lt "$t" ]; then exit 0; fi
+exec /usr/sbin/rtcwake -m no -t "$t"

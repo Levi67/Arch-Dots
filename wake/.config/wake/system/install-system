@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Installs the root-side parts of the daily wake alarm (run with sudo, again after changing these files):
+#   /usr/local/bin/set-wake-alarm               arms the RTC for the next 05:40 (WAKE_TIME to change)
+#   /usr/local/bin/wake-test                    reboot to BIOS, then power off and wake 2 min later
+#   /etc/systemd/system/wake-alarm.service      re-arms the alarm at boot and right before shutdown
+#   /etc/systemd/system/wake-test.service       one-shot half of wake-test
+# Needs "wake on RTC" / "Power On By RTC" allowed in the BIOS.
+set -euo pipefail
+[[ $EUID -eq 0 ]] || exec sudo "$0" "$@"
+HERE="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+
+install -Dm755 "$HERE/../set-wake-alarm" /usr/local/bin/set-wake-alarm
+install -Dm755 "$HERE/../wake-test" /usr/local/bin/wake-test
+install -Dm644 "$HERE/wake-alarm.service" /etc/systemd/system/wake-alarm.service
+install -Dm644 "$HERE/wake-test.service" /etc/systemd/system/wake-test.service
+
+systemctl daemon-reload
+systemctl enable --now wake-alarm.service
+systemctl enable wake-test.service
+echo "wake alarm: system parts installed"

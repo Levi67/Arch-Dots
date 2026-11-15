@@ -1,0 +1,8 @@
+#!/bin/sh
+# Reboot into BIOS; on the next Linux boot, power off and wake 2 minutes later.
+set -e
+[ "$(id -u)" -eq 0 ] || exec sudo "$0" "$@"
+touch /var/lib/wake-test-pending
+echo "Rebooting into BIOS. After you save & exit, Linux boots, waits 30s, shuts down and should power on 2 min later."
+sleep 3
+systemctl reboot --firmware-setup

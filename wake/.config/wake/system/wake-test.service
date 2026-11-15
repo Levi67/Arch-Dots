@@ -1,0 +1,13 @@
+[Unit]
+Description=One-shot RTC wake test (armed by wake-test)
+ConditionPathExists=/var/lib/wake-test-pending
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/rm -f /var/lib/wake-test-pending
+ExecStartPre=/usr/bin/sleep 30
+ExecStart=/usr/sbin/rtcwake -m off -s 120
+
+[Install]
+WantedBy=multi-user.target
