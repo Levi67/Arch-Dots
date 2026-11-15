@@ -7,7 +7,7 @@ local menu = "qs ipc --path ~/.config/quickshell/popups.qml call launcher toggle
 local wallpaper = "qs ipc --path ~/.config/quickshell/popups.qml call wallpaper toggle"
 local debate = "qs ipc --path ~/.config/quickshell/popups.qml call debate toggle"
 local lock = "hyprlock"
-local shader = "hyprshade toggle ~/.config/hypr/shaders/vibrance.glsl"
+local shader = "~/.config/hypr/scripts/vibrance-toggle.sh"
 
 hl.bind("SUPER + SUPER_L", hl.dsp.exec_cmd(menu), { release = true })
 hl.bind("SUPER + W", hl.dsp.exec_cmd(wallpaper), { release = true })
