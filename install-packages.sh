@@ -43,6 +43,8 @@ PACMAN_PKGS=(
     hyprsunset
     ddcutil
     power-profiles-daemon
+    # case RGB (rgb/.config/rgb/rgbctl): RAM + motherboard
+    openrgb
 )
 
 echo "=== Installing Official Packages ==="
@@ -57,6 +59,9 @@ AUR_PKGS=(
     vesktop-bin
     zen-browser-bin
     spicetify-cli
+    # case RGB: Python client for rgbctl; OpenLinkHub drives the Corsair hub (fans + its LEDs)
+    python-openrgb
+    openlinkhub-bin
 )
 
 echo "=== Installing AUR Packages ==="
@@ -77,6 +82,14 @@ sudo systemctl enable --now power-profiles-daemon.service
 # ddcutil talks to monitors over /dev/i2c-*; load the module now and on every boot
 echo i2c-dev | sudo tee /etc/modules-load.d/i2c-dev.conf >/dev/null
 sudo modprobe i2c-dev || true
+
+# 6c. Case RGB: dark at boot/sleep, OpenRGB kept off the Corsair hub (see rgb/.config/rgb/rgbctl).
+# OpenLinkHub itself needs per-machine setup in its web UI / config (OpenRGB bridge, LED ports).
+echo "=== Case RGB ==="
+# the package's udev rule names a user it creates afterwards; udevd only resolves it after a restart
+sudo systemctl restart systemd-udevd
+sudo udevadm trigger --action=add --subsystem-match=hidraw
+sudo "$(dirname "$(readlink -f "$0")")/rgb/.config/rgb/system/install-system"
 
 # 7. Setup Spicetify Permissions & Initial Inject
 echo "=== Setting Up Spicetify ==="

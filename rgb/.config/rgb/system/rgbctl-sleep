@@ -1,0 +1,21 @@
+#!/bin/sh
+# systemd-sleep hook (/usr/lib/systemd/system-sleep/rgbctl): case RGB dark before sleep;
+# after resume, everyone whose RGB was on gets it back. The delay: OpenLinkHub re-initializes
+# the Corsair hub 15 s after resume (resumeDelay) and would reset it again.
+case "$1" in
+pre)
+    timeout 10 /usr/local/bin/rgbctl blackout >/dev/null 2>&1 || true
+    ;;
+post)
+    for f in /run/user/*/rgbctl/state.json; do
+        [ -f "$f" ] || continue
+        grep -q '"on": true' "$f" || continue
+        uid=$(stat -c %u "$f")
+        home=$(getent passwd "$uid" | cut -d: -f6)
+        [ -x "$home/.config/rgb/rgbctl" ] || continue
+        systemd-run --quiet --uid="$uid" --setenv=HOME="$home" --setenv=XDG_RUNTIME_DIR="/run/user/$uid" \
+            --on-active=20 "$home/.config/rgb/rgbctl" apply --wait 40 || true
+    done
+    ;;
+esac
+exit 0

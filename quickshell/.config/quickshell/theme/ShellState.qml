@@ -17,7 +17,8 @@ Singleton {
             bolt: 0xF140B, speedo: 0xF04C5, leaf: 0xF032A, rocket: 0xF0463,
             close: 0xF0156, check: 0xF012C, lock: 0xF033E, refresh: 0xF0450, folder: 0xF024B,
             font: 0xF06D6, chevron: 0xF0142, app: 0xF003B, brightness: 0xF00DF, terminal: 0xF018D,
-            plus: 0xF0415, minus: 0xF0374
+            plus: 0xF0415, minus: 0xF0374,
+            rgb: 0xF1051, fan: 0xF0210, memory: 0xF035B, chip: 0xF061A, swap: 0xF04E1
         })
     function icon(name) {
         return String.fromCodePoint(icons[name] ?? 0x3F);

@@ -1,0 +1,13 @@
+{
+  "brightness": 100,
+  "direction": "forward",
+  "devices": {},
+  "zoneOrder": {
+    "COMMANDER CORE XT": [2, 1, 3, 0]
+  },
+  "argbLeds": {},
+  "winter": {
+    "palette": ["#7FC8FF", "#BDE6FF", "#FFFFFF", "#9AD0FF", "#5FA8FF"],
+    "accent": "#BDE6FF"
+  }
+}

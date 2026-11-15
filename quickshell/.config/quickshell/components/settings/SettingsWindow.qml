@@ -2,7 +2,7 @@
 //   qs ipc call settings toggle | open <page> | close | quick  (quick = the bar's quick panel)
 //   qs ipc call settings get <area> <path>          e.g. get bar clock.hour24
 //   qs ipc call settings set <area> <path> <json>   e.g. set bar clock.seconds true
-// Pages: winter, theme, audio, network, displays, power. Every change is saved instantly
+// Pages: winter, theme, audio, network, displays, power, rgb. Every change is saved instantly
 // (Config.* -> ~/.config/desktop/*.json); only Displays asks before keeping a change.
 import QtQuick
 import QtQuick.Layouts
@@ -52,6 +52,12 @@ Scope {
             label: "Power",
             icon: "power",
             file: "PowerPage.qml"
+        },
+        {
+            id: "rgb",
+            label: "RGB",
+            icon: "rgb",
+            file: "RgbPage.qml"
         }
     ]
 
@@ -83,7 +89,7 @@ Scope {
         }
         function set(area: string, path: string, value: string): string {
             if (!Config[area])
-                return "unknown area (winter, theme, bar, power, displays)";
+                return "unknown area (winter, theme, bar, power, displays, rgb)";
             try {
                 Config[area].set(path, JSON.parse(value));
                 return "ok";

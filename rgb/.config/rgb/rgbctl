@@ -1,0 +1,325 @@
+#!/usr/bin/env python3
+"""rgbctl - case RGB: off by default, on = a gradient in the desktop's theme colors.
+
+    rgbctl on | off | toggle     switch it (remembered until reboot)
+    rgbctl apply                 repaint from the current state (theme/settings changed, after resume)
+    rgbctl blackout              everything dark, state untouched (boot, before sleep)
+    rgbctl status                {"on": .., "servers": {..}} as JSON
+    rgbctl list                  devices + zones as JSON (settings page)
+    rgbctl save-off              store "off" in the motherboard and RAM themselves, so they
+                                 stay dark at boot/shutdown before anything runs (run once)
+    --wait N                     wait up to N s for the servers and their devices (boot/resume)
+
+Two OpenRGB-protocol servers:
+    OpenRGB      127.0.0.1:6742  RAM + motherboard (allowlist in /etc/openrgb/OpenRGB.json)
+    OpenLinkHub  127.0.0.1:6743  the Corsair hub (OpenLinkHub keeps the fans; never open the hub in OpenRGB)
+
+Settings: ~/.config/quickshell/defaults/rgb.json overlaid with ~/.config/desktop/rgb.json
+(the Quickshell settings page edits that one). On/off lives in $XDG_RUNTIME_DIR/rgbctl/state.json,
+so every boot starts dark.
+Colors: wallust's color1-6 (~/.config/kitty/wallust-colors.conf) at full brightness, or the
+icy palette from rgb.json while winter mode is on.
+"""
+import colorsys
+import json
+import os
+import socket
+import sys
+import time
+
+SERVERS = {"openrgb": 6742, "openlinkhub": 6743}
+HOME = os.path.expanduser("~")
+CFG_HOME = os.environ.get("XDG_CONFIG_HOME") or os.path.join(HOME, ".config")
+RUNTIME = os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}"
+STATE = os.path.join(RUNTIME, "rgbctl", "state.json")
+BLACK = (0, 0, 0)
+
+
+# ---------- settings ----------
+def load_json(path):
+    try:
+        with open(path) as f:
+            v = json.load(f)
+        return v if isinstance(v, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def merge(a, b):
+    if not isinstance(a, dict) or not isinstance(b, dict):
+        return a if b is None else b
+    out = dict(a)
+    for k, v in b.items():
+        out[k] = merge(a[k], v) if k in a else v
+    return out
+
+
+def area(name):
+    return merge(load_json(os.path.join(CFG_HOME, "quickshell", "defaults", f"{name}.json")),
+                 load_json(os.path.join(CFG_HOME, "desktop", f"{name}.json")))
+
+
+def read_state():
+    return bool(load_json(STATE).get("on", False))
+
+
+def write_state(on):
+    os.makedirs(os.path.dirname(STATE), exist_ok=True)
+    tmp = STATE + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump({"on": on}, f)
+    os.replace(tmp, STATE)
+
+
+# ---------- colors ----------
+def hex_rgb(h):
+    h = h.strip().lstrip("#")
+    if len(h) == 8:          # #AARRGGBB (Qt style)
+        h = h[2:]
+    return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def full_value(c):
+    """LEDs look washed out at the wallpaper's darkness: keep hue + saturation, max the value."""
+    hh, s, _ = colorsys.rgb_to_hsv(*(x / 255 for x in c))
+    return tuple(round(x * 255) for x in colorsys.hsv_to_rgb(hh, s, 1.0))
+
+
+def wallust_colors():
+    cols = {}
+    try:
+        with open(os.path.join(CFG_HOME, "kitty", "wallust-colors.conf")) as f:
+            for line in f:
+                parts = line.split()
+                if len(parts) == 2 and parts[0].startswith("color"):
+                    cols[parts[0]] = parts[1]
+    except OSError:
+        pass
+    return cols
+
+
+def palette(cfg):
+    """(gradient colors, accent) for the current theme."""
+    winter = area("winter").get("enabled", False)
+    if winter:
+        w = cfg.get("winter", {})
+        grad = [hex_rgb(c) for c in w.get("palette", [])] or [(160, 215, 255), (255, 255, 255)]
+        return grad, hex_rgb(w.get("accent", "#A0D7FF"))
+    cols = wallust_colors()
+    grad = [full_value(hex_rgb(cols[f"color{i}"])) for i in range(1, 7) if f"color{i}" in cols]
+    if not grad:
+        grad = [(255, 255, 255)]
+    accent = full_value(hex_rgb(cols["color4"])) if "color4" in cols else grad[0]
+    return grad, accent
+
+
+def sample(grad, t):
+    if len(grad) == 1:
+        return grad[0]
+    t = min(max(t, 0.0), 1.0) * (len(grad) - 1)
+    i = min(int(t), len(grad) - 2)
+    f = t - i
+    a, b = grad[i], grad[i + 1]
+    return tuple(round(a[k] + (b[k] - a[k]) * f) for k in range(3))
+
+
+def dim(c, brightness):
+    return tuple(round(x * brightness) for x in c)
+
+
+# ---------- servers ----------
+def port_open(port):
+    try:
+        with socket.create_connection(("127.0.0.1", port), timeout=0.5):
+            return True
+    except OSError:
+        return False
+
+
+def connect(wait=0.0):
+    """{server: OpenRGBClient}; with wait, retry until each server is up and has devices."""
+    from openrgb import OpenRGBClient
+    deadline = time.monotonic() + wait
+    clients = {}
+    while True:
+        for name, port in SERVERS.items():
+            if name in clients:
+                continue
+            try:
+                c = OpenRGBClient("127.0.0.1", port, "rgbctl")
+            except Exception:
+                continue
+            if c.devices or time.monotonic() >= deadline:
+                clients[name] = c
+            else:
+                c.disconnect()   # up, but the devices aren't initialized yet (boot/resume)
+        if len(clients) == len(SERVERS) or time.monotonic() >= deadline:
+            return clients
+        time.sleep(1)
+
+
+def devices(clients):
+    """[(key, server, device)]; key = name, plus " #n" when a name repeats (the two RAM sticks)."""
+    out = []
+    for server in SERVERS:
+        c = clients.get(server)
+        if not c:
+            continue
+        counts = {}
+        for d in c.devices:
+            counts[d.name] = counts.get(d.name, 0) + 1
+        seen = {}
+        for d in c.devices:
+            seen[d.name] = seen.get(d.name, 0) + 1
+            key = d.name if counts[d.name] == 1 else f"{d.name} #{seen[d.name]}"
+            out.append((key, server, d))
+    return out
+
+
+def direct(d):
+    """switch to the per-LED mode (also leaves a stored effect / "Off")"""
+    try:
+        names = [m.name.lower() for m in d.modes]
+        if "direct" in names and d.modes[d.active_mode].name.lower() != "direct":
+            d.set_mode("direct")
+    except Exception:
+        pass
+
+
+def fix_argb_sizes(c, d, cfg):
+    """motherboard ARGB headers report 0 LEDs until told how many are connected (settings page)"""
+    sizes = cfg.get("argbLeds", {})
+    changed = False
+    for z in d.zones:
+        if z.name.startswith("Addressable RGB Header"):
+            want = int(sizes.get(z.name, 0))
+            if len(z.leds) != want:
+                z.resize(want)
+                changed = True
+    if changed:
+        c.update()
+    return changed
+
+
+def paint(clients, on):
+    cfg = area("rgb")
+    if on:
+        grad, accent = palette(cfg)
+        if cfg.get("direction", "forward") == "reverse":
+            grad = grad[::-1]
+        bright = min(max(float(cfg.get("brightness", 100)), 0), 100) / 100
+    enabled = cfg.get("devices", {})
+    orders = cfg.get("zoneOrder", {})
+
+    if "openrgb" in clients:
+        c = clients["openrgb"]
+        for _, _, d in devices({"openrgb": c}):
+            if fix_argb_sizes(c, d, cfg):
+                break
+    for key, server, d in devices(clients):
+        direct(d)
+        if not on or not enabled.get(key, True):
+            d.set_color(RGB(*BLACK), fast=True)
+            continue
+        zones = list(d.zones)
+        order = orders.get(key)
+        if order:
+            zones = [zones[i] for i in order if 0 <= i < len(zones)] + [z for i, z in enumerate(zones) if i not in order]
+        if server == "openlinkhub":
+            # the hub's fans read as one strip: the gradient runs through them in zoneOrder
+            n = sum(len(z.leds) for z in zones)
+            i = 0
+            for z in zones:
+                cols = []
+                for _ in z.leds:
+                    cols.append(dim(sample(grad, i / max(n - 1, 1)), bright))
+                    i += 1
+                if cols:
+                    z.set_colors([RGB(*x) for x in cols], fast=True)
+        else:
+            for z in zones:
+                n = len(z.leds)
+                if n == 0:
+                    continue
+                if n <= 3:   # tiny zones (the ASUS logo): one solid accent
+                    cols = [dim(accent, bright)] * n
+                else:        # RAM sticks, ARGB headers: the whole gradient along the zone
+                    cols = [dim(sample(grad, i / (n - 1)), bright) for i in range(n)]
+                z.set_colors([RGB(*x) for x in cols], fast=True)
+
+
+def RGB(r, g, b):
+    from openrgb.utils import RGBColor
+    return RGBColor(r, g, b)
+
+
+def save_off(clients):
+    """Store "off" in the devices themselves (motherboard: mode Off + save; RAM: black + save)."""
+    for key, server, d in devices(clients):
+        if server != "openrgb":
+            continue
+        names = [m.name.lower() for m in d.modes]
+        try:
+            if "off" in names:
+                d.set_mode("off", save=True)
+            elif "static" in names or "custom" in names:
+                mode = "static" if "static" in names else "custom"
+                d.set_mode(mode)
+                d.set_color(RGB(*BLACK))
+                d.save_mode()
+            print(f"saved off: {key}")
+        except Exception as e:
+            print(f"couldn't save {key}: {e}", file=sys.stderr)
+
+
+# ---------- cli ----------
+def main(argv):
+    wait = 0.0
+    if "--wait" in argv:
+        i = argv.index("--wait")
+        wait = float(argv[i + 1])
+        argv = argv[:i] + argv[i + 2:]
+    cmd = argv[0] if argv else "status"
+
+    if cmd == "status":
+        print(json.dumps({"on": read_state(), "servers": {n: port_open(p) for n, p in SERVERS.items()}}))
+        return 0
+
+    if cmd in ("on", "off", "toggle"):
+        on = (not read_state()) if cmd == "toggle" else cmd == "on"
+        write_state(on)
+        cmd = "apply"
+
+    clients = connect(wait)
+    if not clients:
+        print("rgbctl: neither OpenRGB (6742) nor OpenLinkHub (6743) is reachable", file=sys.stderr)
+        return 1
+    try:
+        if cmd == "apply":
+            paint(clients, read_state())
+        elif cmd == "blackout":
+            paint(clients, False)
+        elif cmd == "list":
+            print(json.dumps([{
+                "key": key, "server": server, "name": d.name,
+                "zones": [{"name": z.name, "leds": len(z.leds)} for z in d.zones],
+            } for key, server, d in devices(clients)]))
+        elif cmd == "save-off":
+            save_off(clients)
+        else:
+            print(__doc__.strip(), file=sys.stderr)
+            return 2
+    finally:
+        for c in clients.values():
+            try:
+                c.disconnect()
+            except Exception:
+                pass
+    missing = set(SERVERS) - set(clients)
+    if missing:
+        print("rgbctl: not reachable: " + ", ".join(sorted(missing)), file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

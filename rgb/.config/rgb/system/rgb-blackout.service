@@ -1,0 +1,15 @@
+# Case RGB dark at boot: OpenRGB (RAM, motherboard) and OpenLinkHub (Corsair hub) come up
+# showing whatever the devices had; this paints everything black once both are ready.
+# Turning it on is the desktop's job (rgbctl on, quick panel).
+[Unit]
+Description=Turn case RGB off at boot
+Wants=openrgb.service openlinkhub.service
+After=openrgb.service openlinkhub.service
+
+[Service]
+Type=oneshot
+DynamicUser=yes
+ExecStart=/usr/local/bin/rgbctl blackout --wait 90
+
+[Install]
+WantedBy=multi-user.target

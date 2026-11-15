@@ -7,16 +7,16 @@ QtObject {
     readonly property bool winter: Winter.themeOverride && Winter.barOn
 
     // Colors (from the wallpaper)
-    readonly property color background: "#181016"
-    readonly property color barBackground: winter ? Winter.barTint : "#bb181016"   // semi-transparent
+    readonly property color background: "#0D1419"
+    readonly property color barBackground: winter ? Winter.barTint : "#bb0D1419"   // semi-transparent
 
     // accent: wallust's color4, but never darker than this lightness (0 = black, 1 = white)
     readonly property real minAccentLightness: 0.65
-    readonly property color accentRaw: "#9A94AA"
+    readonly property color accentRaw: "#2C3446"
     readonly property color accent: winter ? Winter.barAccent : Qt.hsla(Math.max(0, accentRaw.hslHue), accentRaw.hslSaturation, Math.max(accentRaw.hslLightness, minAccentLightness), 1.0)
-    readonly property color text: winter ? Winter.barText : "#E6C4DC"
-    readonly property color inactiveWorkspace: winter ? Winter.barInactive : "#93758C"
-    readonly property color activeWorkspace: winter ? Winter.barText : "#E6C4DC"
+    readonly property color text: winter ? Winter.barText : "#E3A89C"
+    readonly property color inactiveWorkspace: winter ? Winter.barInactive : "#916056"
+    readonly property color activeWorkspace: winter ? Winter.barText : "#E3A89C"
 
     // Spacing & Sizing
     readonly property int bubbleHeight: 30

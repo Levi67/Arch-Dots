@@ -18,6 +18,7 @@ Singleton {
     readonly property alias bar: barCfg
     readonly property alias power: powerCfg
     readonly property alias displays: displaysCfg
+    readonly property alias rgb: rgbCfg
 
     // "~/x" -> "/home/you/x"
     function expand(path) {
@@ -51,6 +52,12 @@ Singleton {
     ConfigFile {
         id: displaysCfg
         name: "displays"
+        defaultsDir: root.defaultsDir
+        liveDir: root.liveDir
+    }
+    ConfigFile {
+        id: rgbCfg
+        name: "rgb"
         defaultsDir: root.defaultsDir
         liveDir: root.liveDir
     }

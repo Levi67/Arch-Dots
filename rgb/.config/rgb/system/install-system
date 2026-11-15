@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Installs the root-side parts of case RGB control (run with sudo, again after changing these files):
+#   /usr/local/bin/rgbctl                     copy for boot/sleep (root must not run a user-writable file)
+#   /etc/systemd/system/rgb-blackout.service  dark at boot
+#   /usr/lib/systemd/system-sleep/rgbctl      dark before sleep, restore after resume
+#   /etc/openrgb/OpenRGB.json                 detector allowlist: only ASUS Aura + Corsair RAM
+#                                             (keeps OpenRGB off the Corsair hub = OpenLinkHub's fans,
+#                                             and off keyboard/mouse/headset/Stream Deck)
+set -euo pipefail
+[[ $EUID -eq 0 ]] || exec sudo "$0" "$@"
+HERE="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+
+install -Dm755 "$HERE/../rgbctl" /usr/local/bin/rgbctl
+install -Dm644 "$HERE/rgb-blackout.service" /etc/systemd/system/rgb-blackout.service
+install -Dm755 "$HERE/rgbctl-sleep" /usr/lib/systemd/system-sleep/rgbctl
+
+# OpenRGB rewrites its config on exit: stop it, merge our detector list in, start it again
+systemctl stop openrgb.service 2>/dev/null || true
+mkdir -p /etc/openrgb
+python3 -I - "$HERE/openrgb.json" /etc/openrgb/OpenRGB.json <<'PY'
+import json, sys
+src, dst = sys.argv[1], sys.argv[2]
+try:
+    cfg = json.load(open(dst))
+except (OSError, ValueError):
+    cfg = {}
+cfg["Detectors"] = json.load(open(src))["Detectors"]
+json.dump(cfg, open(dst, "w"), indent=4)
+PY
+
+systemctl daemon-reload
+systemctl enable --now openrgb.service openlinkhub.service
+systemctl enable rgb-blackout.service
+echo "case RGB: system parts installed"

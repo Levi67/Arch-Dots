@@ -1,6 +1,6 @@
 // components/QuickPanel.qml
 // Quick settings dropdown under the status bubble: volume + output, Wi-Fi, Bluetooth,
-// night light, power profile. The gear opens the full settings (SUPER+I).
+// night light, case RGB (+ brightness while on), power profile. The gear opens the full settings (SUPER+I).
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
@@ -296,7 +296,7 @@ PanelWindow {
             // toggles (right click = open the page)
             GridLayout {
                 Layout.fillWidth: true
-                columns: 3
+                columns: 2
                 columnSpacing: 8
                 rowSpacing: 8
 
@@ -326,6 +326,35 @@ PanelWindow {
                     available: NightLight.available
                     page: "power"
                     onToggled: NightLight.toggle()
+                }
+                Tile {
+                    icon: "rgb"
+                    title: "RGB"
+                    subtitle: !Rgb.available ? "Unavailable" : Rgb.on ? Rgb.brightness + "%" : "Off"
+                    active: Rgb.on
+                    available: Rgb.available
+                    page: "rgb"
+                    onToggled: Rgb.toggle()
+                }
+            }
+
+            // RGB brightness (only while it's on)
+            RowLayout {
+                Layout.fillWidth: true
+                visible: Rgb.on
+                spacing: 10
+                S.SIcon {
+                    name: "rgb"
+                    size: 20
+                }
+                S.SSlider {
+                    Layout.fillWidth: true
+                    from: 5
+                    to: 100
+                    stepSize: 5
+                    value: Rgb.brightness
+                    format: v => Math.round(v) + "%"
+                    onCommitted: v => Config.rgb.set("brightness", v)
                 }
             }
 
