@@ -1,5 +1,8 @@
 if status is-interactive
-    set -g fish_greeting ""
+    # Show fastfetch as the greeting for every new interactive shell
+    function fish_greeting
+        fastfetch
+    end
     # Commands to run in interactive sessions can go here
 
 
