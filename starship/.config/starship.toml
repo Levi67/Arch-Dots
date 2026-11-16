@@ -1,0 +1,75 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Minimal two-part prompt: context on the left, ❯ on its own line.
+# Accent is the same slate blue as fastfetch (#7c839e).
+add_newline = true
+
+format = """
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$python\
+$nodejs\
+$rust\
+$golang\
+$cmd_duration\
+$line_break\
+$character"""
+
+[directory]
+style = "bold #7c839e"
+truncation_length = 3
+truncate_to_repo = true
+read_only = " 󰌾"
+
+[git_branch]
+symbol = " "
+style = "#a6adc8"
+format = "[$symbol$branch]($style) "
+
+[git_state]
+style = "yellow"
+format = '[\($state( $progress_current/$progress_total)\)]($style) '
+
+[git_status]
+style = "#e5c07b"
+format = '([$all_status$ahead_behind]($style) )'
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+modified = "!${count}"
+staged = "+${count}"
+untracked = "?${count}"
+deleted = "✘${count}"
+stashed = ""
+
+[python]
+symbol = " "
+style = "#6c7086"
+format = '[$symbol$version( \($virtualenv\))]($style) '
+
+[nodejs]
+symbol = " "
+style = "#6c7086"
+format = "[$symbol$version]($style) "
+
+[rust]
+symbol = " "
+style = "#6c7086"
+format = "[$symbol$version]($style) "
+
+[golang]
+symbol = " "
+style = "#6c7086"
+format = "[$symbol$version]($style) "
+
+[cmd_duration]
+min_time = 2000
+style = "#6c7086"
+format = "[󰔟 $duration]($style) "
+
+[character]
+success_symbol = "[❯](bold #7c839e)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold green)"
