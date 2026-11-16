@@ -117,6 +117,13 @@ else
     log WARN "no kitty process running, nothing to reload"
 fi
 
+# ---- recolor the starship prompt + fastfetch (repaints open fish shells) ----
+if "$HOME/.config/scripts/term-theme"; then
+    log INFO "updated terminal prompt colors (term-theme)"
+else
+    log WARN "term-theme failed"
+fi
+
 # ---- reload cava (colors only) ----
 if pkill -USR2 -x cava; then
     log INFO "sent color reload signal (SIGUSR2) to cava"

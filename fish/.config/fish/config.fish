@@ -1,7 +1,23 @@
 if status is-interactive
+    # Prompt + fastfetch colors follow the desktop theme (wallust / winter mode).
+    # ~/.config/scripts/term-theme writes ~/.cache/term-theme and sends SIGUSR2
+    # to every shell registered below, which repaints the prompt live.
+    set -l term_theme ~/.cache/term-theme
+    test -s $term_theme/starship.toml; or ~/.config/scripts/term-theme
+    test -s $term_theme/starship.toml; and set -gx STARSHIP_CONFIG $term_theme/starship.toml
+
+    set -g __term_theme_pid $XDG_RUNTIME_DIR/term-theme/fish/$fish_pid
+    mkdir -p (path dirname $__term_theme_pid); and touch $__term_theme_pid
+    function __term_theme_repaint --on-signal SIGUSR2
+        commandline -f repaint
+    end
+    function __term_theme_unregister --on-event fish_exit
+        rm -f $__term_theme_pid
+    end
+
     # Show fastfetch as the greeting for every new interactive shell
     function fish_greeting
-        fastfetch
+        fastfetch (cat ~/.cache/term-theme/fastfetch.args 2>/dev/null)
     end
     # Commands to run in interactive sessions can go here
 

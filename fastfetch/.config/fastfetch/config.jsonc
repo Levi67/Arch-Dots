@@ -7,7 +7,7 @@
       "left": 2,
       "right": 3
     },
-    // Matches the slate-blue/lavender hue from your image (#7c839e)
+    // Default slate blue; fish passes the themed colors from ~/.cache/term-theme/fastfetch.args
     "color": {
       "1": "38;2;124;131;158",
       "2": "38;2;124;131;158"
@@ -22,13 +22,13 @@
   "modules": [
     "title",
     { "type": "custom", "format": "────────────" },
-    { "type": "os", "key": "OS", "keyColor": "90", "format": "{name}" },
-    { "type": "kernel", "key": "Kernel", "keyColor": "90", "format": "{release}" },
-    { "type": "uptime", "key": "Uptime", "keyColor": "90" },
-    { "type": "packages", "key": "Packages", "keyColor": "90" },
-    { "type": "wm", "key": "WM", "keyColor": "90", "format": "{pretty-name}" },
-    { "type": "cpu", "key": "CPU", "keyColor": "34", "format": "{name}" },
-    { "type": "gpu", "key": "GPU", "keyColor": "34", "format": "{name}", "hideType": "integrated" },
-    { "type": "memory", "key": "Memory", "keyColor": "34" }
+    { "type": "os", "key": "OS", "format": "{name}" },
+    { "type": "kernel", "key": "Kernel", "format": "{release}" },
+    { "type": "uptime", "key": "Uptime" },
+    { "type": "packages", "key": "Packages" },
+    { "type": "wm", "key": "WM", "format": "{pretty-name}" },
+    { "type": "cpu", "key": "CPU", "format": "{name}" },
+    { "type": "gpu", "key": "GPU", "format": "{name}", "hideType": "integrated" },
+    { "type": "memory", "key": "Memory" }
   ]
 }
