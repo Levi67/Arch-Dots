@@ -13,19 +13,12 @@ local autostart_apps = {
     "sh -c 'sleep 3 && ~/.config/winter/winterctl apply'"  -- load snow caps plugin if winter mode is on
 }
 
--- The Lua config is re-evaluated on every reload (e.g. when winterctl loads
--- the snowcaps plugin), so only run autostart once per Hyprland session.
-local sig = os.getenv("HYPRLAND_INSTANCE_SIGNATURE") or "default"
-local runtime = os.getenv("XDG_RUNTIME_DIR") or "/tmp"
-local marker = runtime .. "/hypr/" .. sig .. "/autostart.done"
-
-local f = io.open(marker, "r")
-if f then
-    f:close()
-else
+-- Run once the compositor is up (WAYLAND_DISPLAY exists). Running exec_cmd
+-- at top level fires during the very first config parse, before the Wayland
+-- socket exists, so qs etc. die. "hyprland.start" fires once per session and
+-- not on config reloads (e.g. when winterctl loads the snowcaps plugin).
+hl.on("hyprland.start", function()
     for _, cmd in ipairs(autostart_apps) do
         hl.exec_cmd(cmd)
     end
-    local w = io.open(marker, "w")
-    if w then w:close() end
-end
+end)
