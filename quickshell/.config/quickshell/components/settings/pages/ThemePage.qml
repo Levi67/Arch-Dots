@@ -163,7 +163,7 @@ SPage {
             SCombo {
                 Layout.preferredWidth: 300
                 options: ["sans-serif"].concat(page.families)
-                current: page.t.get("font.family", "sans-serif")
+                current: page.t.get("font.family", "JetBrainsMono Nerd Font")
                 onPicked: v => page.t.set("font.family", v)
             }
         }

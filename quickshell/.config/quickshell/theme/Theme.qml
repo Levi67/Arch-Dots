@@ -25,7 +25,7 @@ QtObject {
 
     // Text properties
     readonly property int textSize: Config.theme.get("font.barSize", 20)
-    readonly property string fontFamily: Config.theme.get("font.family", "sans-serif")   // settings window -> Theme
+    readonly property string fontFamily: Config.theme.get("font.family", "JetBrainsMono Nerd Font")   // settings window -> Theme
 
     readonly property int gapSize: 5
     readonly property int barPadding: 8

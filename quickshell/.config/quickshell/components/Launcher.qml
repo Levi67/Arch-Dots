@@ -97,6 +97,7 @@ Scope {
                     placeholderText: "Search apps..."
                     placeholderTextColor: Qt.rgba(Theme.text.r, Theme.text.g, Theme.text.b, 0.4)
                     color: Theme.text
+                    font.family: Theme.fontFamily
                     font.pixelSize: Theme.textSize
                     verticalAlignment: TextInput.AlignVCenter
 
@@ -156,6 +157,7 @@ Scope {
                             Text {
                                 text: modelData.name
                                 color: Theme.text
+                                font.family: Theme.fontFamily
                                 font.pixelSize: Theme.fontSize
                                 Layout.alignment: Qt.AlignVCenter
                                 verticalAlignment: Text.AlignVCenter

@@ -108,6 +108,7 @@ Scope {
                         Text {
                             text: card.modelData.appName
                             color: Theme.inactiveWorkspace
+                            font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSize - 2
                             font.bold: true
                         }
@@ -117,6 +118,7 @@ Scope {
                             visible: text !== ""
                             text: card.modelData.summary
                             color: card.critical ? root.cCritical : Theme.text
+                            font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSize
                             font.bold: true
                             wrapMode: Text.Wrap
@@ -129,6 +131,7 @@ Scope {
                             text: card.modelData.body
                             color: Theme.text
                             opacity: 0.8
+                            font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSize - 1
                             wrapMode: Text.Wrap
                             Layout.fillWidth: true
@@ -154,6 +157,7 @@ Scope {
                                         anchors.centerIn: parent
                                         text: parent.modelData.text
                                         color: Theme.background
+                                        font.family: Theme.fontFamily
                                         font.pixelSize: Theme.fontSize - 2
                                         font.bold: true
                                     }

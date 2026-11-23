@@ -12,7 +12,7 @@ Row {
     readonly property int updateSeconds: Math.max(1, Config.bar.get("stats.updateSeconds", 2))
     readonly property int hotTemp: Config.bar.get("stats.hotTemp", 80)          // temps at/above this turn accent colored
     readonly property bool showGpuTemp: Config.bar.get("stats.gpuTemp", false)  // false = GPU usage %, true = GPU temperature
-    property string iconFont: Theme.fontFamily   // must be a Nerd Font (or any installed Nerd Font gets used as fallback)
+    property string iconFont: ShellState.iconFont   // always the Nerd Font, so the icons keep their size whatever Theme.fontFamily is
     property int textSize: Theme.textSize
 
     // ---- values (filled by the script below) ----
