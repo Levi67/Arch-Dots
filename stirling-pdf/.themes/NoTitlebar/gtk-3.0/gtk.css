@@ -1,0 +1,30 @@
+/* Adwaita without a title bar or window frame.
+   Only used by apps launched with GTK_THEME=NoTitlebar (e.g. Stirling PDF). */
+@import url("resource:///org/gtk/libgtk/theme/Adwaita/gtk-contained.css");
+
+/* collapse the header bar to 0 px (a negative margin is the only way, its buttons have a minimum size) */
+headerbar, headerbar:backdrop, .titlebar, .titlebar:backdrop {
+  min-height: 0;
+  padding: 0;
+  margin: 0 0 -200px 0;
+  border: none;
+  box-shadow: none;
+  background: none;
+  opacity: 0;
+}
+
+/* no CSD frame: border, shadow, resize margin or rounded corners */
+decoration, decoration:backdrop,
+.csd decoration, .csd decoration:backdrop,
+window.csd decoration, window.csd decoration:backdrop,
+.solid-csd decoration, .solid-csd decoration:backdrop {
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+window, window.csd, window.solid-csd, window.background {
+  border: none;
+  border-radius: 0;
+}
