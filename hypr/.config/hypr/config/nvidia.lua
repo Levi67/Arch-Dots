@@ -1,5 +1,11 @@
 -- NVIDIA-specific settings for Hyprland (RTX 4080 Super)
 
+-- Render on the NVIDIA card only. Without this Hyprland picks the AMD iGPU
+-- (no monitors attached) as primary, so all apps render via Mesa on the iGPU
+-- and copy cross-GPU -> Chromium/Qt apps (vesktop, anki) crash.
+-- Symlink is stable across boots (card0/card1 numbering can swap).
+hl.env("AQ_DRM_DEVICES", "/home/levi/.config/hypr/card-nvidia")
+
 -- Hardware video decode via libva-nvidia-driver
 hl.env("LIBVA_DRIVER_NAME", "nvidia")
 hl.env("NVD_BACKEND", "direct")
